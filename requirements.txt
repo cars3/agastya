@@ -1,0 +1,11 @@
+numpy
+torch
+torchvision
+sentence-transformers
+fastapi
+uvicorn
+pydantic
+python-dotenv
+typesafe-sdk
+datasets
+rank_bm25

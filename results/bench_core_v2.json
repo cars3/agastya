@@ -1,0 +1,239 @@
+{
+  "queries": 20,
+  "leaf_hit_rate": 0.95,
+  "avg_leaves_returned": 4.2,
+  "p50_latency_s": 0.42246961349155754,
+  "max_latency_s": 0.8135379520244896,
+  "rows": [
+    {
+      "query": "How is the perplexity of a test set calculated according to a language model?",
+      "gold": "Summary",
+      "hit": false,
+      "returned": 4,
+      "gold_path": [
+        "I Large Language Models",
+        "N-gram Language Models",
+        "Summary"
+      ]
+    },
+    {
+      "query": "What are the three main factors that determine the performance of large language models?",
+      "gold": "What is a Large Language Model?",
+      "hit": true,
+      "returned": 7,
+      "gold_path": [
+        "I Large Language Models",
+        "Introduction",
+        "What is a Large Language Model?"
+      ]
+    },
+    {
+      "query": "In the context of using Unix commands for tokenization, what is the purpose of the -s ('squeeze') option in the tr command?",
+      "gold": "Simple Unix Tools for Word Tokenization",
+      "hit": true,
+      "returned": 4,
+      "gold_path": [
+        "I Large Language Models",
+        "Words and Tokens",
+        "Simple Unix Tools for Word Tokenization"
+      ]
+    },
+    {
+      "query": "Why can the use of anthropomorphism be problematic when referring to Large Language Models (LLMs)?",
+      "gold": "Anthropomorphism and Terminology",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "I Large Language Models",
+        "Introduction",
+        "Anthropomorphism and Terminology"
+      ]
+    },
+    {
+      "query": "In the context of cross-validation, why is it problematic to examine the corpus to suggest possible features?",
+      "gold": "Test sets and Cross-validation",
+      "hit": true,
+      "returned": 6,
+      "gold_path": [
+        "I Large Language Models",
+        "Logistic Regression",
+        "Test sets and Cross-validation"
+      ]
+    },
+    {
+      "query": "What is the difference between the SimLex-999 and WordSim-353 datasets in terms of what they quantify?",
+      "gold": "Evaluating Vector Models",
+      "hit": true,
+      "returned": 6,
+      "gold_path": [
+        "I Large Language Models",
+        "Embeddings",
+        "Evaluating Vector Models"
+      ]
+    },
+    {
+      "query": "How does the feedforward layer differ from the attention network in terms of how they handle token positions?",
+      "gold": "Feedforward layer",
+      "hit": true,
+      "returned": 4,
+      "gold_path": [
+        "I Large Language Models",
+        "Transformers and Pretraining",
+        "Transformer Blocks",
+        "Feedforward layer"
+      ]
+    },
+    {
+      "query": "According to the Bradley-Terry Model, how is the probability of a preference between two outputs, oi and oj, calculated based on their associated scores zi and zj?",
+      "gold": "Modeling Preferences",
+      "hit": true,
+      "returned": 6,
+      "gold_path": [
+        "I Large Language Models",
+        "Post-training",
+        "Learning from Preferences",
+        "Modeling Preferences"
+      ]
+    },
+    {
+      "query": "What are the four steps involved in training a probe?",
+      "gold": "Probing",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "II Advanced LLM Topics and Tools",
+        "Interpretability",
+        "Probing"
+      ]
+    },
+    {
+      "query": "What two components are generally required to produce sentence alignments from two documents that are translations of each other?",
+      "gold": "Creating the Training data",
+      "hit": true,
+      "returned": 5,
+      "gold_path": [
+        "II Advanced LLM Topics and Tools",
+        "Machine Translation",
+        "Machine Translation using Encoder-Decoder",
+        "Creating the Training data"
+      ]
+    },
+    {
+      "query": "What is the process for autoregressive generation using an RNN-based neural language model?",
+      "gold": "Generation with RNN-Based Language Models",
+      "hit": true,
+      "returned": 4,
+      "gold_path": [
+        "II Advanced LLM Topics and Tools",
+        "RNNs and LSTMs",
+        "RNNs for other NLP tasks",
+        "Generation with RNN-Based Language Models"
+      ]
+    },
+    {
+      "query": "What is a formant, and why do different vowels produce different formants?",
+      "gold": "Spectra and the Frequency Domain",
+      "hit": true,
+      "returned": 5,
+      "gold_path": [
+        "II Advanced LLM Topics and Tools",
+        "Phonetics and Speech Feature Extraction",
+        "Acoustic Phonetics and Signals",
+        "Spectra and the Frequency Domain"
+      ]
+    },
+    {
+      "query": "How is the sum over all possible alignments efficiently computed when calculating the CTC loss function?",
+      "gold": "CTC Training",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "II Advanced LLM Topics and Tools",
+        "Automatic Speech Recognition",
+        "CTC",
+        "CTC Training"
+      ]
+    },
+    {
+      "query": "What is the difference between strongly equivalent and weakly equivalent grammars?",
+      "gold": "Grammar Equivalence and Normal Form",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Context-Free Grammars and Constituency Parsing",
+        "Grammar Equivalence and Normal Form"
+      ]
+    },
+    {
+      "query": "How does the arc-eager transition system allow a word to be assigned its head while still remaining available to serve as the head for subsequent words?",
+      "gold": "Advanced Methods in Transition-Based Parsing",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Dependency Parsing",
+        "Transition-Based Dependency Parsing",
+        "Advanced Methods in Transition-Based Parsing"
+      ]
+    },
+    {
+      "query": "What are the three specific labels used in BIO tagging to capture the boundaries and types of named entities?",
+      "gold": "Named Entities and Named Entity Tagging",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Sequence Labeling for Parts of Speech and Named Entities",
+        "Named Entities and Named Entity Tagging"
+      ]
+    },
+    {
+      "query": "What is the difference between thematic roles and other semantic role models such as those used in PropBank and FrameNet?",
+      "gold": "Summary",
+      "hit": true,
+      "returned": 4,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Semantic Role Labeling",
+        "Summary"
+      ]
+    },
+    {
+      "query": "What is the difference between absolute and relative temporal expressions?",
+      "gold": "Extracting Temporal Expressions",
+      "hit": true,
+      "returned": 3,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Information Extraction: Relations, Events, and Time",
+        "Automatic Temporal Analysis",
+        "Extracting Temporal Expressions"
+      ]
+    },
+    {
+      "query": "Why might a pronoun like 'he' be resolved to the object of a sentence rather than the subject in the case of a verb like 'criticized'?",
+      "gold": "Linguistic Properties of the Coreference Relation",
+      "hit": true,
+      "returned": 4,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Coreference Resolution and Entity Linking",
+        "Coreference Phenomena: Linguistic Background",
+        "Linguistic Properties of the Coreference Relation"
+      ]
+    },
+    {
+      "query": "How do modern systems generally perform EDU segmentation?",
+      "gold": "EDU segmentation for RST parsing",
+      "hit": true,
+      "returned": 4,
+      "gold_path": [
+        "III Annotating Linguistic Structure",
+        "Discourse Coherence",
+        "Discourse Structure Parsing",
+        "EDU segmentation for RST parsing"
+      ]
+    }
+  ]
+}

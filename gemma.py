@@ -33,6 +33,7 @@ from sentence_transformers import SentenceTransformer
 MODEL_ID = "google/embeddinggemma-2"
 SENTENCES_PER_CHUNK = 3   # chunk = this many sentences, whatever their length
 SENTENCE_OVERLAP = 1      # sentences repeated at the start of the next chunk
+MAX_CHUNK_CHARS = 1200    # hard-split sentences longer than this (tables, dense runs)
 TOP_K = 5
 
 DEVICE = os.getenv("GEMMA_DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -96,6 +97,22 @@ SAMPLE_QUERIES = [
 ]
 
 
+def _split_long_sentence(sentence: str) -> list[str]:
+    """Hard-split a sentence longer than MAX_CHUNK_CHARS at word boundaries."""
+    if len(sentence) <= MAX_CHUNK_CHARS:
+        return [sentence]
+    parts, current = [], ""
+    for word in sentence.split():
+        if current and len(current) + len(word) + 1 > MAX_CHUNK_CHARS:
+            parts.append(current.strip())
+            current = word
+        else:
+            current = f"{current} {word}" if current else word
+    if current.strip():
+        parts.append(current.strip())
+    return parts
+
+
 def chunk_text(
     text: str,
     sentences_per_chunk: int = SENTENCES_PER_CHUNK,
@@ -105,12 +122,18 @@ def chunk_text(
 
     A chunk is `sentences_per_chunk` consecutive sentences; the next chunk starts
     `overlap` sentences back. Nothing is cut mid-sentence and there is no character
-    budget, so a long sentence simply makes a long chunk.
+    budget, so a long sentence simply makes a long chunk. Sentences longer than
+    MAX_CHUNK_CHARS (tables, dense runs) are hard-split at word boundaries.
     """
     text = re.sub(r"\s+", " ", text).strip()
     sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
     if not sentences:
         return []
+
+    expanded: list[str] = []
+    for sentence in sentences:
+        expanded.extend(_split_long_sentence(sentence))
+    sentences = expanded
 
     step = max(1, sentences_per_chunk - overlap)
     chunks: list[str] = []

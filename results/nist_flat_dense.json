@@ -1,0 +1,462 @@
+{
+  "embedding_model": "google/embeddinggemma-2",
+  "generation_model": "reused queries",
+  "documents": 331,
+  "queries": 60,
+  "metrics": {
+    "R@1": 0.8166666666666667,
+    "R@3": 0.9333333333333333,
+    "R@5": 0.95,
+    "nDCG@3": 0.8815464876785729,
+    "nDCG@5": 0.8879940344658153,
+    "MRR": 0.8720833333333332
+  },
+  "by_level": {
+    "level_1": {
+      "R@1": 1.0,
+      "R@3": 1.0,
+      "R@5": 1.0,
+      "nDCG@3": 1.0,
+      "nDCG@5": 1.0,
+      "MRR": 1.0
+    },
+    "level_2": {
+      "R@1": 0.0,
+      "R@3": 0.5,
+      "R@5": 0.5,
+      "nDCG@3": 0.25,
+      "nDCG@5": 0.25,
+      "MRR": 0.19444444444444442
+    },
+    "level_3": {
+      "R@1": 0.8421052631578947,
+      "R@3": 0.9473684210526315,
+      "R@5": 0.9649122807017544,
+      "nDCG@3": 0.9016278817669189,
+      "nDCG@5": 0.9084147731219108,
+      "MRR": 0.8936159844054581
+    }
+  },
+  "per_query": [
+    {
+      "query": "Which specific roles are identified as having security and privacy assessment and monitoring responsibilities?",
+      "gold_title": "1.2   TARGET AUDIENCE",
+      "rank": 17,
+      "top1": "PM-12 INSIDER THREAT PROGRAM",
+      "hit": false
+    },
+    {
+      "query": "What is the difference between labeling and marking in the context of associating attributes with subjects and objects?",
+      "gold_title": "AC-13 SUPERVISION AND REVIEW \u2014 ACCESS CONTROL",
+      "rank": 0,
+      "top1": "AC-13 SUPERVISION AND REVIEW \u2014 ACCESS CONTROL",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of control enhancements, and under what conditions should an organization select and implement them?",
+      "gold_title": "2.2   CONTROL STRUCTURE AND ORGANIZATION",
+      "rank": 2,
+      "top1": "CONTROL SUMMARIES",
+      "hit": true
+    },
+    {
+      "query": "Under what condition do the information security standards and guidelines developed by NIST apply to national security systems?",
+      "gold_title": "NIST SP 800-53 Rev. 5, Security and Privacy Controls for Information Systems and Organizations",
+      "rank": 0,
+      "top1": "NIST SP 800-53 Rev. 5, Security and Privacy Controls for Information Systems and Organizations",
+      "hit": true
+    },
+    {
+      "query": "Why is the use of alternate authentication factors permitted after a user has exceeded the number of consecutive invalid logon attempts?",
+      "gold_title": "AC-8 SYSTEM USE NOTIFICATION",
+      "rank": 1,
+      "top1": "AC-7 UNSUCCESSFUL LOGON ATTEMPTS",
+      "hit": true
+    },
+    {
+      "query": "What actions can an organization take to reduce the probability that wireless access point signals are received outside of organization-controlled boundaries?",
+      "gold_title": "AC-19 ACCESS CONTROL FOR MOBILE DEVICES",
+      "rank": 0,
+      "top1": "AC-19 ACCESS CONTROL FOR MOBILE DEVICES",
+      "hit": true
+    },
+    {
+      "query": "What are the three design requirements for a reference validation mechanism, and what is the purpose of the 'smallness' property?",
+      "gold_title": "AC-24 ACCESS CONTROL DECISIONS",
+      "rank": 0,
+      "top1": "AC-24 ACCESS CONTROL DECISIONS",
+      "hit": true
+    },
+    {
+      "query": "What is the difference between how temporary accounts and emergency accounts are established?",
+      "gold_title": "AC-2 ACCOUNT MANAGEMENT",
+      "rank": 0,
+      "top1": "AC-2 ACCOUNT MANAGEMENT",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of event types that may be logged to support the security of systems and the privacy of individuals?",
+      "gold_title": "AT-6 TRAINING FEEDBACK",
+      "rank": 0,
+      "top1": "AT-6 TRAINING FEEDBACK",
+      "hit": true
+    },
+    {
+      "query": "What is the difference between full text analysis and other types of analysis regarding privileged commands?",
+      "gold_title": "AU-5 RESPONSE TO AUDIT LOGGING PROCESS FAILURES",
+      "rank": 0,
+      "top1": "AU-5 RESPONSE TO AUDIT LOGGING PROCESS FAILURES",
+      "hit": true
+    },
+    {
+      "query": "What are the four sources organizations can use to satisfy annual assessment requirements?",
+      "gold_title": "CA-1 POLICY AND PROCEDURES",
+      "rank": 0,
+      "top1": "CA-1 POLICY AND PROCEDURES",
+      "hit": true
+    },
+    {
+      "query": "Why is it beneficial for audit records to follow common standards?",
+      "gold_title": "AU-11 AUDIT RECORD RETENTION",
+      "rank": 0,
+      "top1": "AU-11 AUDIT RECORD RETENTION",
+      "hit": true
+    },
+    {
+      "query": "How can organizations use the results from red team exercises?",
+      "gold_title": "CA-9 INTERNAL SYSTEM CONNECTIONS",
+      "rank": 0,
+      "top1": "CA-9 INTERNAL SYSTEM CONNECTIONS",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of employing dual authorization when implementing changes to selected system components and information?",
+      "gold_title": "CM-5 ACCESS RESTRICTIONS FOR CHANGE",
+      "rank": 0,
+      "top1": "CM-5 ACCESS RESTRICTIONS FOR CHANGE",
+      "hit": true
+    },
+    {
+      "query": "What is the primary security advantage of using open-source software for organizations?",
+      "gold_title": "CM-11 USER-INSTALLED SOFTWARE",
+      "rank": 0,
+      "top1": "CM-11 USER-INSTALLED SOFTWARE",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of enforcing dual authorization for the deletion or destruction of backup information?",
+      "gold_title": "CP-8 TELECOMMUNICATIONS SERVICES",
+      "rank": 0,
+      "top1": "CP-8 TELECOMMUNICATIONS SERVICES",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of mechanisms an organization can use to disrupt system functions or services to assess system resilience?",
+      "gold_title": "CP-2 CONTINGENCY PLAN",
+      "rank": 0,
+      "top1": "CP-2 CONTINGENCY PLAN",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of replay-resistant techniques used in authentication processes?",
+      "gold_title": "IA-1 POLICY AND PROCEDURES",
+      "rank": 2,
+      "top1": "IA-9 SERVICE IDENTIFICATION AND AUTHENTICATION",
+      "hit": true
+    },
+    {
+      "query": "What factors do organizations consider when balancing the ease of use for accessing federal information and systems with the need to mitigate risk?",
+      "gold_title": "IA-7 CRYPTOGRAPHIC MODULE AUTHENTICATION",
+      "rank": 2,
+      "top1": "1.3   ORGANIZATIONAL RESPONSIBILITIES",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of events that may precipitate an update to incident response policy and procedures?",
+      "gold_title": "IA-12 IDENTITY PROOFING",
+      "rank": 0,
+      "top1": "IA-12 IDENTITY PROOFING",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of incident response support resources that organizations provide to users?",
+      "gold_title": "IR-7 INCIDENT RESPONSE ASSISTANCE",
+      "rank": 0,
+      "top1": "IR-7 INCIDENT RESPONSE ASSISTANCE",
+      "hit": true
+    },
+    {
+      "query": "Why is it important to monitor maintenance tools that execute with increased privilege?",
+      "gold_title": "MA-3 MAINTENANCE TOOLS",
+      "rank": 0,
+      "top1": "MA-3 MAINTENANCE TOOLS",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of automated mechanisms that can be used to restrict and log access to media storage areas?",
+      "gold_title": "MP-2 MEDIA ACCESS",
+      "rank": 0,
+      "top1": "MP-2 MEDIA ACCESS",
+      "hit": true
+    },
+    {
+      "query": "What specific information is included in visitor access records?",
+      "gold_title": "PE-5 ACCESS CONTROL FOR OUTPUT DEVICES",
+      "rank": 0,
+      "top1": "PE-5 ACCESS CONTROL FOR OUTPUT DEVICES",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of downgrading classified information using approved sanitization tools and procedures?",
+      "gold_title": "MP-7 MEDIA USE",
+      "rank": 0,
+      "top1": "MP-7 MEDIA USE",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of providing master shutoff or isolation valves in organizational facilities?",
+      "gold_title": "PE-10 EMERGENCY SHUTOFF",
+      "rank": 0,
+      "top1": "PE-10 EMERGENCY SHUTOFF",
+      "hit": true
+    },
+    {
+      "query": "How is the process of tailoring a control baseline accomplished?",
+      "gold_title": "PE-21 ELECTROMAGNETIC PULSE PROTECTION",
+      "rank": 0,
+      "top1": "PE-21 ELECTROMAGNETIC PULSE PROTECTION",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of using references within security and privacy plans?",
+      "gold_title": "PE-16 DELIVERY AND REMOVAL",
+      "rank": 0,
+      "top1": "PE-16 DELIVERY AND REMOVAL",
+      "hit": true
+    },
+    {
+      "query": "What specific information must be included in an organization's accounting of disclosures of personally identifiable information?",
+      "gold_title": "PL-10 Baseline Selection",
+      "rank": 7,
+      "top1": "PL-11 Baseline Tailoring",
+      "hit": false
+    },
+    {
+      "query": "What are protection needs and what are they designed to counter?",
+      "gold_title": "PL-5 PRIVACY IMPACT ASSESSMENT",
+      "rank": 2,
+      "top1": "PE-21 ELECTROMAGNETIC PULSE PROTECTION",
+      "hit": true
+    },
+    {
+      "query": "Why is it important for organizations to analyze whether information resources are being used consistent with their intended purpose?",
+      "gold_title": "PM-5 SYSTEM INVENTORY",
+      "rank": 0,
+      "top1": "PM-5 SYSTEM INVENTORY",
+      "hit": true
+    },
+    {
+      "query": "Who should organizations consult with regarding matters of employee sanctions?",
+      "gold_title": "PM-11 MISSION AND BUSINESS PROCESS DEFINITION",
+      "rank": 0,
+      "top1": "PM-11 MISSION AND BUSINESS PROCESS DEFINITION",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of events that may precipitate an update to risk assessment policy and procedures?",
+      "gold_title": "PM-22 PERSONALLY IDENTIFIABLE INFORMATION QUALITY MANAGEMENT",
+      "rank": 0,
+      "top1": "PM-22 PERSONALLY IDENTIFIABLE INFORMATION QUALITY MANAGEMENT",
+      "hit": true
+    },
+    {
+      "query": "How do data tags support the tracking of processing purposes for personally identifiable information?",
+      "gold_title": "PM-16 THREAT AWARENESS PROGRAM",
+      "rank": 1,
+      "top1": "PM-14 TESTING, TRAINING, AND MONITORING",
+      "hit": true
+    },
+    {
+      "query": "How can the breadth and depth of vulnerability scanning coverage be expressed?",
+      "gold_title": "PM-28 RISK FRAMING",
+      "rank": 1,
+      "top1": "PM-29 RISK MANAGEMENT PROGRAM LEADERSHIP ROLES",
+      "hit": true
+    },
+    {
+      "query": "Why is it beneficial for organizations to identify functions, ports, protocols, and services early in the system development life cycle?",
+      "gold_title": "PS-8 PERSONNEL SANCTIONS",
+      "rank": 0,
+      "top1": "PS-8 PERSONNEL SANCTIONS",
+      "hit": true
+    },
+    {
+      "query": "What does resource allocation for information security and privacy include throughout the system development life cycle?",
+      "gold_title": "PS-3 PERSONNEL SCREENING",
+      "rank": 0,
+      "top1": "PS-3 PERSONNEL SCREENING",
+      "hit": true
+    },
+    {
+      "query": "According to the principle of performance security, how is the insufficiency of a security service determined?",
+      "gold_title": "RA-2 SECURITY CATEGORIZATION",
+      "rank": 0,
+      "top1": "RA-2 SECURITY CATEGORIZATION",
+      "hit": true
+    },
+    {
+      "query": "Why does the principle of minimized security elements suggest that a system should contain as few trustworthy components as possible?",
+      "gold_title": "PT-5 PRIVACY NOTICE",
+      "rank": 0,
+      "top1": "PT-5 PRIVACY NOTICE",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of configuration items that are placed under configuration management?",
+      "gold_title": "RA-8 PRIVACY IMPACT ASSESSMENTS",
+      "rank": 4,
+      "top1": "CM-9 CONFIGURATION MANAGEMENT PLAN",
+      "hit": false
+    },
+    {
+      "query": "Where was the 'SUPPLY CHAIN PROTECTION | OPERATIONS SECURITY' control enhancement moved after being withdrawn?",
+      "gold_title": "SA-3 SYSTEM DEVELOPMENT LIFE CYCLE",
+      "rank": 8,
+      "top1": "PE-16 DELIVERY AND REMOVAL",
+      "hit": false
+    },
+    {
+      "query": "What additional controls can be employed when an organization chooses not to reimplement or custom develop critical system components and no alternative sourcing is available?",
+      "gold_title": "SA-9 EXTERNAL SYSTEM SERVICES",
+      "rank": 0,
+      "top1": "SA-9 EXTERNAL SYSTEM SERVICES",
+      "hit": true
+    },
+    {
+      "query": "What are the specific components of communication patterns that should be concealed or randomized to protect against unauthorized disclosure of information?",
+      "gold_title": "SC-2 SEPARATION OF SYSTEM AND USER FUNCTIONALITY",
+      "rank": 0,
+      "top1": "SC-2 SEPARATION OF SYSTEM AND USER FUNCTIONALITY",
+      "hit": true
+    },
+    {
+      "query": "What are two examples of devices that enforce strict adherence to protocol formats to prevent the exfiltration of information?",
+      "gold_title": "SA-20 CUSTOMIZED DEVELOPMENT OF CRITICAL COMPONENTS",
+      "rank": 0,
+      "top1": "SA-20 CUSTOMIZED DEVELOPMENT OF CRITICAL COMPONENTS",
+      "hit": true
+    },
+    {
+      "query": "What are two examples of hardware separation mechanisms used to implement security function isolation?",
+      "gold_title": "SA-14 CRITICALITY ANALYSIS",
+      "rank": 0,
+      "top1": "SA-14 CRITICALITY ANALYSIS",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of corrective actions that can be taken when unacceptable mobile code is detected?",
+      "gold_title": "SC-8 TRANSMISSION CONFIDENTIALITY AND INTEGRITY",
+      "rank": 0,
+      "top1": "SC-8 TRANSMISSION CONFIDENTIALITY AND INTEGRITY",
+      "hit": true
+    },
+    {
+      "query": "How does moving organizational information to offline storage benefit security compared to online storage?",
+      "gold_title": "SC-13  CRYPTOGRAPHIC PROTECTION",
+      "rank": 0,
+      "top1": "SC-13  CRYPTOGRAPHIC PROTECTION",
+      "hit": true
+    },
+    {
+      "query": "What are the five steps involved in the operations security (OPSEC) process?",
+      "gold_title": "SC-19 VOICE OVER INTERNET PROTOCOL",
+      "rank": 0,
+      "top1": "SC-19 VOICE OVER INTERNET PROTOCOL",
+      "hit": true
+    },
+    {
+      "query": "Why is it important to remove previous versions of software and firmware after updated versions have been installed?",
+      "gold_title": "SC-30 CONCEALMENT AND MISDIRECTION",
+      "rank": 0,
+      "top1": "SC-30 CONCEALMENT AND MISDIRECTION",
+      "hit": true
+    },
+    {
+      "query": "What is the primary purpose of using detonation chambers, also known as dynamic execution environments?",
+      "gold_title": "SC-24 FAIL IN KNOWN STATE",
+      "rank": 0,
+      "top1": "SC-24 FAIL IN KNOWN STATE",
+      "hit": true
+    },
+    {
+      "query": "How do alerts generated by organizations in SI-4(12) differ from alerts generated by the system?",
+      "gold_title": "SC-35 EXTERNAL MALICIOUS CODE IDENTIFICATION",
+      "rank": 0,
+      "top1": "SC-35 EXTERNAL MALICIOUS CODE IDENTIFICATION",
+      "hit": true
+    },
+    {
+      "query": "What are some examples of integrity-checking mechanisms that can automatically monitor the integrity of systems and hosted applications?",
+      "gold_title": "SC-41 PORT AND I/O DEVICE ACCESS",
+      "rank": 0,
+      "top1": "SC-41 PORT AND I/O DEVICE ACCESS",
+      "hit": true
+    },
+    {
+      "query": "How does prescreening inputs before they are passed to interpreters protect a system?",
+      "gold_title": "SC-46 CROSS DOMAIN POLICY ENFORCEMENT",
+      "rank": 0,
+      "top1": "SC-46 CROSS DOMAIN POLICY ENFORCEMENT",
+      "hit": true
+    },
+    {
+      "query": "What are some of the specific privacy risks that may be inadvertently created by using automated mechanisms to improve data quality?",
+      "gold_title": "SI-1 POLICY AND PROCEDURES",
+      "rank": 0,
+      "top1": "SI-1 POLICY AND PROCEDURES",
+      "hit": true
+    },
+    {
+      "query": "At what stages of the system development life cycle can data, documentation, tools, or system components be disposed of?",
+      "gold_title": "SI-17 FAIL-SAFE PROCEDURES",
+      "rank": 0,
+      "top1": "SI-17 FAIL-SAFE PROCEDURES",
+      "hit": true
+    },
+    {
+      "query": "What is the 'pedigree' in the context of validating technologies, products, and services?",
+      "gold_title": "SI-12 INFORMATION MANAGEMENT AND RETENTION",
+      "rank": 0,
+      "top1": "SI-12 INFORMATION MANAGEMENT AND RETENTION",
+      "hit": true
+    },
+    {
+      "query": "Why might an organization choose to divide information into disparate elements and distribute them across multiple systems and locations?",
+      "gold_title": "SI-6 SECURITY AND PRIVACY FUNCTION VERIFICATION",
+      "rank": 0,
+      "top1": "SI-6 SECURITY AND PRIVACY FUNCTION VERIFICATION",
+      "hit": true
+    },
+    {
+      "query": "What is the title of the Federal Information Processing Standards Publication FIPS 202?",
+      "gold_title": "SI-23 INFORMATION FRAGMENTATION",
+      "rank": 0,
+      "top1": "SI-23 INFORMATION FRAGMENTATION",
+      "hit": true
+    },
+    {
+      "query": "What is the purpose of the Criticality Analysis Process Model described in NIST Interagency or Internal Report (IR) 8179?",
+      "gold_title": "SR-11 COMPONENT AUTHENTICITY",
+      "rank": 0,
+      "top1": "SR-11 COMPONENT AUTHENTICITY",
+      "hit": true
+    },
+    {
+      "query": "Which NIST Special Publication provides a guide to SSL VPNs?",
+      "gold_title": "SR-5 ACQUISITION STRATEGIES, TOOLS, AND METHODS",
+      "rank": 0,
+      "top1": "SR-5 ACQUISITION STRATEGIES, TOOLS, AND METHODS",
+      "hit": true
+    }
+  ]
+}

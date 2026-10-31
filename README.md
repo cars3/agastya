@@ -2,8 +2,6 @@
 
 ToC-navigated retrieval. A decision model (Jev, TypeSafe) walks a document's table of contents section by section, and local embeddings (EmbeddingGemma 2) rank the leaves it keeps. No training, no labels, no fine-tuning: point it at a structured document and it navigates.
 
-The name follows the rishi, fitting a workspace where the hypothesis chain already runs as Bramha, Vishnu, and Maheshwara.
-
 ## Headline result
 
 **89.1% of gold sections returned at 3.6 leaves per query.** Measured on all 6,005 test queries of the public SearchTome release (6 domains), training-free, on one 8GB consumer GPU. Zero empty results.
@@ -57,7 +55,20 @@ Design notes:
 
 This is the workload the system was built for: a deep hierarchy where the walk prunes 389 leaves with 2 to 4 Jev calls per query, the embedding union converts near-miss walk decisions into hits, and the fallback removes the zero-result failure mode. Questions here are generated per leaf by a separate LLM, so this validates the plumbing and the navigation, not retrieval quality against gold queries.
 
-### 2. Library scale: what the architecture does not solve (limit case)
+### 2. Industry use case: enterprise compliance (NIST SP 800-53 Rev 5)
+
+Scenario: a GRC / security-compliance assistant over a control catalog. These documents are 300+ leaves deep, get revised on a schedule (Rev 5 to Rev 5.1.1 and beyond), and a wrong answer becomes a compliance finding. Retraining a retriever per revision is a non-starter for most teams; a training-free navigator that returns a small reviewable set with an auditable path is the natural fit.
+
+Experiment: NIST SP 800-53 Rev 5, 331 control sections, 3 levels (Introduction > control family > control). 60 questions generated blind, with the section title withheld from the question writer. Measured on the RTX 2060 SUPER 8GB, float32 EmbeddingGemma.
+
+| system | result |
+| --- | --- |
+| flat dense (EmbeddingGemma) over all 331 controls | R@1 81.7, R@3 93.3, R@5 95.0, nDCG@3 88.2 |
+| Agastya (`/ask` pipeline) | 93.3% leaf hit at 5.5 leaves, p50 0.40s, zero empty results |
+
+Reading: at this corpus size dense retrieval is just as strong per leaf, so the honest claim is not a recall win. The compliance case rests on the other properties: no training spend per revision, a returned set small enough for a human to review, an auditable kill log, and no silent empty results. That is what a compliance team actually needs from retrieval, and the pipeline delivers it at 0.4s per question on consumer hardware.
+
+### 3. Library scale: what the architecture does not solve (limit case)
 
 All six SearchTome domains pooled into one 413-section corpus with a 3-level tree (book > chapter > section), same 6,005 gold queries, chapter nodes untitled ("Chapter 9"):
 
@@ -72,6 +83,8 @@ The walk loses its footing here: cross-domain routing across 6 books and untitle
 ## When to use it, and when not
 
 Use it when the document is deep and structured (3+ ToC levels with titled chapters, a few hundred to a few thousand leaves), when the corpus changes often and you cannot retrain, and when recall of a small returned set matters more than rank-1. It is training-free and auditable: every kill is a logged section with its probability.
+
+Concrete industry fit: security-compliance and GRC assistants over control catalogs like NIST SP 800-53, where a document is 300+ leaves deep, gets revised quarterly, and every retrieval needs a reviewable justification. See the experiment in section 2 above: 93.3% hit at 5.5 leaves, p50 0.40s, zero training.
 
 Do not use it for flat corpora under a few hundred sections (a plain dense retriever wins R@1 at zero marginal cost), cross-domain trees with untitled chapters (measured above), high-QPS serving (one external call per walk level), or leaderboard chasing against trained retrievers on flat data.
 
@@ -117,10 +130,13 @@ python core.py --serve          # POST /ask {"question": "..."} on 127.0.0.1:800
 python core.py "What is TTS?"   # one-shot from the CLI
 ```
 
+Point it at any prepared book: `RAG_DATA=data/books/<book> python core.py --serve`.
+
 Benchmarks:
 
 ```bash
 python bench_book.py --leaves data/books/<book>/leaves.jsonl --out data/books/<book>/bench
+python bench_book.py --leaves data/books/<book>/leaves.jsonl --out data/books/<book>/bench --blind   # titles withheld
 python bench_core.py --n 20 --queries data/books/<book>/bench_core.json
 python bench_searchtome.py --limit 120   # sampled, ~120 queries per domain
 python bench_searchtome.py --full        # all 6,005 test queries

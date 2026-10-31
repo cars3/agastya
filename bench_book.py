@@ -66,6 +66,9 @@ Section text:
 {text}
 """
 
+# Same prompt with the title line removed, for blinded question generation.
+PROMPT_BLIND = PROMPT.replace("\nSection title: {title}\n", "\n")
+
 
 def parse_json(text: str) -> dict:
     text = text.strip()
@@ -79,8 +82,9 @@ def parse_json(text: str) -> dict:
         return json.loads(text[start:end + 1])
 
 
-def generate_one(leaf: dict, base: str, key: str, model: str, retries: int = 2) -> dict | None:
-    prompt = PROMPT.format(title=leaf["title"], text=leaf["content"][:DOC_CHAR_LIMIT])
+def generate_one(leaf: dict, base: str, key: str, model: str, retries: int = 2, blind: bool = False) -> dict | None:
+    template = PROMPT_BLIND if blind else PROMPT
+    prompt = template.format(title=leaf["title"], text=leaf["content"][:DOC_CHAR_LIMIT])
     payload = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
@@ -119,10 +123,10 @@ def generate_one(leaf: dict, base: str, key: str, model: str, retries: int = 2) 
     return None
 
 
-def generate_queries(leaves: list[dict], base: str, key: str, model: str, workers: int) -> list[dict]:
+def generate_queries(leaves: list[dict], base: str, key: str, model: str, workers: int, blind: bool = False) -> list[dict]:
     queries: list[dict] = []
     with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = {pool.submit(generate_one, leaf, base, key, model): leaf for leaf in leaves}
+        futures = {pool.submit(generate_one, leaf, base, key, model, 2, blind): leaf for leaf in leaves}
         for done, future in enumerate(as_completed(futures), start=1):
             row = future.result()
             if row:
@@ -162,6 +166,7 @@ def main() -> None:
     ap.add_argument("--queries", type=Path, default=None, help="reuse queries.jsonl instead of generating")
     ap.add_argument("--limit", type=int, default=0, help="use only N evenly spaced leaves (0 = all)")
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--blind", action="store_true", help="withhold the section title from the question writer")
     ap.add_argument("--model", default=DEFAULT_MODEL, help="generation model")
     ap.add_argument("--base", default=DEFAULT_BASE, help="OpenAI-compatible base URL")
     ap.add_argument("--key", default=DEFAULT_KEY)
@@ -182,7 +187,7 @@ def main() -> None:
     else:
         print(f"generating questions with {args.model} via {args.base} ...")
         t0 = time.time()
-        queries = generate_queries(usable, args.base, args.key, args.model, args.workers)
+        queries = generate_queries(usable, args.base, args.key, args.model, args.workers, blind=args.blind)
         print(f"generated {len(queries)} questions in {time.time() - t0:.1f}s")
         (args.out / "queries.jsonl").write_text("".join(json.dumps(q) + "\n" for q in queries))
         print(f"wrote {args.out/'queries.jsonl'}")

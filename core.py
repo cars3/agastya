@@ -22,6 +22,7 @@ Or ask once from the CLI:
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -34,7 +35,7 @@ from gemma import chunk_text, embed_documents, embed_query, load_model, top_k
 from jev import ask
 
 BASE = Path(__file__).resolve().parent
-DATA = BASE / "data" / "books" / "slp3"
+DATA = Path(os.environ.get("RAG_DATA") or BASE / "data" / "books" / "slp3")
 THRESHOLD = 0.85
 EMBED_TOP_K = 3          # embedding leaves added alongside the walk
 EMBED_FALLBACK_K = 5     # embedding leaves used when the walk returns nothing
@@ -54,7 +55,7 @@ leaf_entries = [leaf for leaf in leaves if leaf["content"].strip()]
 leaf_texts = [f"{leaf['title']}\n{leaf['content'][:DOC_CHAR_LIMIT]}" for leaf in leaf_entries]
 
 FULL_VECS = (
-    embed_documents(model, leaf_texts, batch_size=4)
+    embed_documents(model, leaf_texts, batch_size=2)
     if leaf_texts
     else np.zeros((0, 768), dtype=np.float32)
 )
@@ -66,7 +67,7 @@ for leaf in leaf_entries:
     chunk_bounds.append((len(chunk_texts), len(chunk_texts) + len(chunks)))
     chunk_texts.extend(chunks)
 CHUNK_VECS = (
-    embed_documents(model, chunk_texts, batch_size=16)
+    embed_documents(model, chunk_texts, batch_size=8)
     if chunk_texts
     else np.zeros((0, 768), dtype=np.float32)
 )
@@ -75,7 +76,7 @@ CHUNK_VECS = (
 leaf_index = {
     tuple(leaf["path"] + [leaf["title"]]): i for i, leaf in enumerate(leaf_entries)
 }
-print(f"precomputed {len(leaf_entries)} leaf vectors and {len(chunk_texts)} chunk vectors",
+print(f"precomputed {len(leaf_entries)} leaf vectors and {len(chunk_texts)} chunk vectors from {DATA}",
       flush=True)
 
 

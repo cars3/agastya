@@ -31,6 +31,12 @@ def main() -> None:
     ap.add_argument("--base", default="http://localhost:11434/v1")
     ap.add_argument("--key", default="ollama")
     ap.add_argument(
+        "--leaves",
+        type=Path,
+        default=LEAVES,
+        help="leaves.jsonl for the book (defaults to the SLP3 fixture)",
+    )
+    ap.add_argument(
         "--queries",
         type=Path,
         default=None,
@@ -38,14 +44,18 @@ def main() -> None:
     )
     args = ap.parse_args()
 
-    leaves = [json.loads(line) for line in LEAVES.open()]
+    leaves = [json.loads(line) for line in args.leaves.open()]
     usable = [leaf for leaf in leaves if leaf["chars"] >= 200]
     step = len(usable) / args.n
     sample = [usable[int(i * step)] for i in range(args.n)]
 
     if args.queries:
-        raw = json.loads(args.queries.read_text())
-        rows = raw.get("rows") if isinstance(raw, dict) else raw
+        text = args.queries.read_text()
+        try:
+            raw = json.loads(text)
+            rows = raw.get("rows") if isinstance(raw, dict) else raw
+        except json.JSONDecodeError:
+            rows = [json.loads(line) for line in text.splitlines() if line.strip()]
         queries = []
         for row in rows:
             gold_path = list(

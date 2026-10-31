@@ -24,6 +24,21 @@ SearchTome public release, all 6 domains, full test splits (6,005 gold queries),
 
 Published R@1 for reference (paper setup, 18 books): STAIR 82.6, DSI 76.9, DPR 68.7, BM25 59.5, Mistral 13.8. See Limitations before comparing.
 
+### Attempted upgrades that did not work (measured)
+
+The obvious next moves were built and run on the same 6,005 queries:
+
+| configuration | R@1 | R@3 | R@5 |
+| --- | --- | --- | --- |
+| dense EmbeddingGemma (deployed ordering) | **63.3** | **83.4** | **89.8** |
+| BM25 alone | 47.1 | 66.4 | 74.5 |
+| hybrid RRF (BM25 + dense) | 59.6 | 80.0 | 86.7 |
+| dense + bge-reranker-v2-m3 | 42.4 | 62.6 | 72.7 |
+| hybrid + reranker | 42.1 | 62.8 | 73.2 |
+| full stack + reranker | 42.0 | 61.8 | 71.7 |
+
+Root causes, probed rather than assumed: BM25 is 16 points behind dense on this corpus, so a 50/50 RRF fusion drags dense down, and reweighting toward dense just returns dense. The cross-encoder scored gold sections below their neighbors on direct inspection (gold 0.002 against 0.04 for an adjacent section), because these "documents" are long multi-topic sections while the model judges short-passage relevance. Fusing the rerank order back with dense recovered only partway (45% vs 57.5% dense R@1 on a 40-query probe). The deployed ordering therefore stays dense; `bench_hybrid.py` ships with the repo so the same test can be rerun on corpora where these upgrades might actually pay.
+
 ## How it works
 
 ```
@@ -89,7 +104,7 @@ python bench_library.py              # pooled 6-book limit test
 
 ## Components
 
-`core.py` is the product (FastAPI `/ask`, walk + union + chunk ranking). `gemma.py` chunks, embeds, and ranks with EmbeddingGemma 2. `jev.py` is the TypeSafe client. `split_pdf.py` turns a PDF outline into ToC leaves. `bench_book.py`, `bench_core.py`, `bench_searchtome.py`, and `bench_library.py` are the benchmarks above. Raw numbers live in `results/`; `data/` is not shipped (book PDFs are not mine to redistribute).
+`core.py` is the product (FastAPI `/ask`, walk + union + chunk ranking). `gemma.py` chunks, embeds, and ranks with EmbeddingGemma 2. `jev.py` is the TypeSafe client. `split_pdf.py` turns a PDF outline into ToC leaves. `bench_book.py`, `bench_core.py`, `bench_searchtome.py`, and `bench_library.py` are the benchmarks above, and `bench_hybrid.py` carries the hybrid/reranker evaluation. Raw numbers live in `results/`; `data/` is not shipped (book PDFs are not mine to redistribute).
 
 ## Limitations, honestly
 
@@ -99,6 +114,7 @@ python bench_library.py              # pooled 6-book limit test
 - The book benchmarks generate their own questions (blind in the NIST run), so they validate plumbing and navigation; SearchTome's gold queries are the external check.
 - One Jev API call per walk level: not built for high-QPS serving, and cost scales with ToC branching, not corpus size.
 - Do not use it for flat corpora under a few hundred sections; a plain dense retriever wins R@1 at zero marginal cost.
+- The obvious ranking upgrades were measured on this data and rejected: hybrid fusion (BM25+dense) scored 59.6 R@1 against dense's 63.3, and an off-the-shelf cross-encoder reranker collapsed to 42.4 by mis-ranking long multi-topic sections. Always re-measure on your own corpus with `bench_hybrid.py` before assuming a reranker helps.
 
 ## License
 

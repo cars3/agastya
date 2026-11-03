@@ -1,6 +1,85 @@
-# Agastya Embeddings System
+# Agastya RAG
 
-ToC-navigated retrieval: a decision model (Jev, TypeSafe) walks a document's table of contents section by section, and local embeddings (EmbeddingGemma 2) rank the leaves it keeps. No training, no labels, no fine-tuning.
+**An IBM STAIR-inspired retrieval system that uses a single thinking process to walk a document's table of contents and reach the right gold-leaf section, fast and efficiently, on one 8GB GPU. No training, no labels, no fine-tuning.**
+
+As an Agent Architect choosing between **Agastya** and **IBM's STAIR** to replace conventional fixed-chunk RAG, **I would choose Agastya (or its hybrid dense + outline-walk pattern) for 95% of real-world production agent architectures**, and reserve **STAIR** strictly for static, high-QPS, closed-world knowledge bases where top-1 precision justifies an ongoing fine-tuning MLOps pipeline.
+
+The reason comes down to a fundamental tension in agent systems: **STAIR optimizes for a static benchmark metric (`Recall@1`), whereas Agastya optimizes for how an LLM agent actually consumes context (`Recall@Budget`, zero-training agility, and auditability).**
+
+---
+
+### 1. Why Agastya Wins for Production Agent Systems
+
+#### A. Agents Care About *Set Recall at a Small Budget*, Not `Recall@1`
+
+STAIR's headline victory is **82.6% R@1** vs. Agastya's **64.2% R@1** (though note the dataset split discrepancy: the public SearchTome release has a lower baseline floor where BM25 hits 47.8% vs. the paper's 59.5%).
+However, in an agentic workflow, you almost never feed just **one** leaf section into the synthesizer LLM. Modern context windows effortlessly handle 3 to 5 leaf sections (or their top chunks).
+
+* At an average budget of **3.6 leaves per query**, Agastya's union pipeline (`walked leaves` $\cup$ `top-3 EmbeddingGemma` + `top-5 fallback`) delivers **89.1% gold recall** on SearchTome, **95% leaf hit at 4.2 leaves** on a deep 389-leaf textbook (*SLP3*), and **93.3% hit at 5.5 leaves** on NIST SP 800-53.
+* Once the gold leaf is inside that ~4-leaf candidate set, the downstream reasoning agent will find the answer. Paying the massive operational tax of fine-tuning a DSI model just to move the gold leaf from rank #3 to rank #1 yields almost zero marginal gain for the final agent response.
+
+#### B. The "Document Revision" Problem (Zero-Shot Agility vs. Parametric Lock-in)
+
+STAIR is built on a **Differentiable Search Index (DSI)**—it bakes the corpus and its Table of Contents directly into the LLM's weights via fine-tuning.
+
+* **In STAIR:** When NIST releases a revision to SP 800-53, a legal team updates a policy manual, or an engineering team commits new documentation, your retriever is instantly stale. Updating it requires generating synthetic queries for the new sections, running a GPU fine-tuning job, validating that catastrophic forgetting hasn't degraded older chapters, and redeploying model weights.
+* **In Agastya:** Updating a document costs a `split_pdf.py` execution and a single startup pass over the leaves with `EmbeddingGemma 2`. It runs on a single 8GB consumer GPU (RTX 2060 SUPER) with **0.40s–0.42s p50 latency** and zero training spend.
+
+#### C. Auditability and Deterministic Fallback ("Kill Logs" vs. Black-Box Weights)
+
+Enterprise agents (especially in compliance, finance, or legal domains) require explainable retrieval traces:
+
+* **STAIR** is a black-box parametric generator. If it outputs section ID `4.2.1` instead of `4.3.2`, you cannot inspect *why* the weights favored one path over the other—and while its hallucination rate is low (less than 0.05%), non-zero structural hallucination is still a risk.
+* **Agastya** produces an explicit, auditable **kill log**: every pruned branch has a named ToC section and a calibrated `noul` probability from `Jev` (TypeSafe). Furthermore, because pure tree-walks fail silently when a top-level branch is wrongly pruned (e.g., 45% hit rate on *SLP3* with a strict walk alone), Agastya's **union with top-3 dense embeddings + top-5 fallback** guarantees **zero empty results** and rescues the hit rate to **95%**.
+
+---
+
+### 2. Where Agastya's Architecture Breaks (And How to Design Around It)
+
+The engineering honesty in Agastya's README actually gives an architect the exact blueprint for how to deploy it safely:
+
+1. **The Multi-Book "Library Scale" Bottleneck:**
+* *The Problem:* Pooling 6 books into one master tree with untitled chapter nodes tanks the `Jev` walk to **44.5% set-hit**, making the union rescue (88.0% at 11.8 leaves) worse than just taking a deeper flat dense `top-k`.
+* *The Agent Fix:* **Never merge multiple books into a single untitled ToC tree.** Instead, give the agent a top-level **Document Router Tool** (or metadata filter) where each book/manual is registered as a distinct, titled entity with its own clean ToC tree. Let the agent pick the book first, then invoke Agastya's `/ask` pipeline on that specific book's tree.
+
+
+2. **Flat Corpora Under ~300 Sections:**
+* *The Problem:* As the README notes, `EmbeddingGemma` alone gets **64.2% R@1 / 84.5% R@3**, and on flat corpora under a few hundred sections, the `Jev` walk adds API calls without improving ranking inside the candidate set.
+* *The Agent Fix:* Add a structural gate at ingestion. If a document's ToC depth is less than 2 levels or has fewer than 250 leaves, bypass the `Jev` walk entirely and route directly to flat `EmbeddingGemma` (in `bf16`/`fp32`). Save the `Jev` walk + union strictly for deep, multi-level hierarchies (like 389-leaf textbooks or 331-control compliance catalogs) where expanding the candidate pool from 3.0 to 3.6–4.2 leaves rescues orthogonal sections that dense similarity misses.
+
+
+3. **Skip the Standard RAG "Best Practices" (BM25 RRF & Cross-Encoders):**
+* One of the most valuable findings in Agastya's README is the negative ablation table. Conventional RAG wisdom says *"always add BM25 hybrid RRF and a BGE cross-encoder reranker."* Here, `bge-reranker-v2-m3` **crashed R@1 from 63.3% down to 42.4%** because ToC leaves are long, multi-topic sections rather than short MS-MARCO passages. Accepting Agastya's architecture means trusting the measured data: keep pure `EmbeddingGemma 2` ordering over the unioned leaf/chunk candidates and drop the cross-encoder.
+
+
+
+---
+
+### 3. When Would an Architect Actually Choose IBM's STAIR?
+
+You would only choose **STAIR** over Agastya if **all four** of the following conditions are true:
+
+1. **Your corpus is frozen for months at a time** (e.g., canonical medical textbooks, fixed historical tax codes, or static hardware manuals).
+2. **You operate at high QPS** where making one external `Jev` API call per ToC level introduces unacceptable network dependency or per-level token/request overhead.
+3. **You have a strict `k=1` budget constraint** where downstream compute only permits retrieving a single section, making STAIR's 82.6% R@1 mandatory.
+4. **You have dedicated GPU MLOps infrastructure** to generate synthetic query-to-ToC training pairs and fine-tune DSI models every time the knowledge base changes.
+
+---
+
+### Architectural Verdict
+
+| Decision Criterion | Winner | Architectural Rationale |
+| --- | --- | --- |
+| **Day-1 Production Readiness** | **Agastya** | Zero fine-tuning; ingest a PDF outline and serve `/ask` in minutes on an 8GB GPU. |
+| **Dynamic / Living Documents** | **Agastya** | Document edits only require re-splitting and re-embedding leaves, not retraining LLM weights. |
+| **End-to-End Agent Answer Quality** | **Agastya** | 89.1%–95% recall within ~4 leaves gives the reasoning LLM everything it needs without DSI training complexity. |
+| **Compliance & Auditability** | **Agastya** | Explicit section-level `Jev` prune probabilities in the kill log + zero empty results. |
+| **Strict Top-1 Accuracy (`R@1`)** | **IBM STAIR** | Parametric memorization of the ToC beats zero-shot dense/decision-walk ranking at `k=1` (82.6% vs 64.2%). |
+| **High-Throughput / Zero External API** | **IBM STAIR** | Single local forward pass of a fine-tuned model vs. sequential per-level `Jev` API calls. |
+
+**My Implementation Plan:** I would deploy **Agastya's `walk + dense union` architecture** for any deep, hierarchical document (>250 leaves, $\ge 3$ ToC levels with clean section titles), pair it with a lightweight **Book/Document Router** at the top level so trees stay per-document rather than pooled, and let **EmbeddingGemma 2 (`fp32`/`bf16`)** handle flat documents directly when the hierarchy isn't deep enough to warrant the `Jev` walk.
+
+---
 
 ## What it is good at
 

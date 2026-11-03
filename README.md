@@ -1,6 +1,6 @@
 # Agastya RAG
 
-**An IBM STAIR-inspired retrieval system that uses a single thinking process to walk a document's table of contents and reach the right gold-leaf section, fast and efficiently, on one 8GB GPU. No training, no labels, no fine-tuning.**
+**Inspired by IBM's STAIR pipeline, Agastya RAG uses a single thinking process to walk a document's table of contents and reach the right gold-leaf section, fast and efficiently, on one 8GB GPU. No training, no labels, no fine-tuning.**
 
 As an Agent Architect choosing between **Agastya** and **IBM's STAIR** to replace conventional fixed-chunk RAG, **I would choose Agastya (or its hybrid dense + outline-walk pattern) for 95% of real-world production agent architectures**, and reserve **STAIR** strictly for static, high-QPS, closed-world knowledge bases where top-1 precision justifies an ongoing fine-tuning MLOps pipeline.
 

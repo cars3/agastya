@@ -55,18 +55,6 @@ This makes Agastya particularly useful for agents working with long technical do
 
 These measurements cover distinct evaluation settings. SearchTome provides an external benchmark, while the deep textbook and NIST evaluations test navigation over larger hierarchical documents.
 
-## Why these numbers matter
-
-An AI agent does not necessarily need the correct passage ranked first. It needs that passage to be present in the context it receives.
-
-On SearchTome:
-
-- EmbeddingGemma alone retrieves the correct section within its top three results for 84.5% of queries.
-- Agastya expands the candidate set through structural navigation, reaching 89.1% gold-section recall while examining an average of only 3.6 sections.
-- This improves evidence coverage without requiring model training or a large retrieval context.
-
-Agastya is designed around Recall@Budget: maximizing the probability that the information an agent needs is present within a limited number of retrieved sections.
-
 ## Benchmarks
 
 ### SearchTome: 6,005 Queries

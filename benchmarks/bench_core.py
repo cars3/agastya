@@ -16,7 +16,7 @@ from pathlib import Path
 
 import requests
 
-from bench_book import generate_queries
+from benchmarks.bench_book import generate_queries
 
 BASE = Path(__file__).resolve().parent
 LEAVES = BASE / "data" / "books" / "slp3" / "leaves.jsonl"

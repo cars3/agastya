@@ -116,68 +116,77 @@ For applications with stable corpora and strict top-one retrieval requirements, 
 
 ## Getting Started
 
-### Requirements
-
-- Python 3
-- Dependencies from `requirements.txt`
-- A TypeSafe API key for Jev
-- A supported environment for EmbeddingGemma 2
-
-The system was evaluated on an NVIDIA RTX 2060 SUPER with 8GB VRAM.
-
-### 1. Install dependencies
+Install from a checkout into a virtual environment (Python 3.10 or newer):
 
 ```bash
+cd /path/to/agastya
 python3 -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install .
 ```
 
-### 2. Configure the environment
+On Windows use `.venv\Scripts\python` and `.venv\Scripts\agastya.exe`. The
+installation downloads PyTorch and other model dependencies. The first query
+also downloads the `google/embeddinggemma-2` model; access to the model and
+Hugging Face authentication may be required. A CUDA GPU is recommended;
+`GEMMA_DEVICE=cpu` selects CPU inference, which can be slow.
+
+Register the installed command with an agent, using the **absolute path** to
+its executable:
 
 ```bash
-cp .env.example .env
+# Claude Code
+claude mcp add agastya -- /absolute/path/to/agastya/.venv/bin/agastya --mcp
 ```
 
-Add your TypeSafe API key to `.env`:
-
-```
-jev_key=apikey_...
-```
-
-### 3. Process a PDF
-
-```bash
-python split_pdf.py data/books/<book>.pdf --out data/books/<book>
+```toml
+# Codex: ~/.codex/config.toml
+[mcp_servers.agastya]
+command = "/absolute/path/to/agastya/.venv/bin/agastya"
+args = ["--mcp"]
 ```
 
-Agastya extracts the document outline and generates the structured leaves used by the retrieval pipeline.
-
-### 4. Start the retrieval API
-
-```bash
-RAG_DATA=data/books/<book> python core.py --serve
-```
-
-The service exposes a FastAPI `/ask` endpoint.
-
-Send a question:
-
-```http
-POST /ask
-Content-Type: application/json
-
+```json
 {
-  "question": "What is TTS?"
+  "mcpServers": {
+    "agastya": {
+      "command": "/absolute/path/to/agastya/.venv/bin/agastya",
+      "args": ["--mcp"]
+    }
+  }
 }
 ```
 
-Alternatively, run a one-shot query from the command line:
+The JSON format is used by clients such as Claude Desktop and Cursor. Restart
+the agent after changing its configuration. Ask it to call `config` with the
+absolute path of a folder containing PDFs, then call `query` with a question.
+PDFs need embedded bookmarks for meaningful section splitting. The index is
+written to `agastya_index` in that folder; the selected index persists across
+server restarts in `~/.config/agastya/active-index.json` (or under
+`XDG_CONFIG_HOME`). Set `AGASTYA_INDEX` in the agent's server environment to
+select a particular existing index instead. The first query embeds the corpus
+in memory, and repeats that work after a server restart.
 
-```bash
-python core.py "What is TTS?"
-```
+| Tool | Purpose |
+| --- | --- |
+| `config(folder, model, out, parquet)` | Build and select an index; Parquet is off by default. |
+| `query(question, leaf, relevant_match)` | Retrieve relevant sections or chunks. |
+| `decide(state, questions, backend)` | Run an optional typed decision backend. |
+
+The MCP query currently ranks sections and chunks with dense embeddings; it
+does not perform the hierarchy walk used in the earlier benchmarks. Scores and
+the optional relevance verdict are heuristics, not calibrated probabilities.
+
+For Parquet output install `pip install '.[parquet]'`. For typed decisions,
+install `pip install '.[decision]'`. The cloud backend additionally needs
+`TYPESAFE_API_KEY` in the agent's environment. The local backend requires a
+compatible Unsloth installation and checkpoint; set `DECISION_MODEL_DIR` to
+its absolute path. See `requirements-agastya-rag.txt` for the original
+machine-specific GPU environment. These optional backends are not required for
+PDF retrieval.
+
+The older `core.py` HTTP service and benchmark scripts still import the removed
+`jev` module and are not currently supported by the MCP installation.
 
 ## Running the Benchmarks
 
@@ -186,7 +195,7 @@ The repository includes reproducible evaluation scripts.
 Evaluate document navigation:
 
 ```bash
-python bench_book.py \
+python benchmarks/bench_book.py \
   --leaves data/books/<book>/leaves.jsonl \
   --out data/books/<book>/bench
 ```
@@ -194,7 +203,7 @@ python bench_book.py \
 Evaluate retrieval latency and quality:
 
 ```bash
-python bench_core.py \
+python benchmarks/bench_core.py \
   --n 20 \
   --queries data/books/<book>/bench_core.json
 ```
@@ -202,20 +211,23 @@ python bench_core.py \
 Run the complete SearchTome benchmark:
 
 ```bash
-python bench_searchtome.py --full
+python benchmarks/bench_searchtome.py --full
 ```
 
 Evaluate multi-document limitations:
 
 ```bash
-python bench_library.py
+python benchmarks/bench_library.py
 ```
 
 Investigate hybrid retrieval and reranking:
 
 ```bash
-python bench_hybrid.py
+python benchmarks/bench_hybrid.py
 ```
+
+These scripts still import the removed `jev` module, so restore or repoint that
+import before running them.
 
 Raw benchmark measurements are stored in `results/`.
 
@@ -223,16 +235,15 @@ Raw benchmark measurements are stored in `results/`.
 
 | Component | Responsibility |
 | --- | --- |
-| `core.py` | Main retrieval pipeline and FastAPI endpoint |
-| `gemma.py` | Embedding, chunking, and semantic ranking |
-| `jev.py` | TypeSafe Jev integration and structural navigation |
+| `main.py` | Corpus build from every PDF, plus the MCP server (`config`, `query`, `decide`) |
+| `decision_model.py` | One `/decide` endpoint over cloud Jev or the local unsloth model, identical output |
 | `split_pdf.py` | PDF outline extraction and document splitting |
-| `bench_book.py` | Book-level retrieval evaluations |
-| `bench_core.py` | Core pipeline benchmarking |
-| `bench_searchtome.py` | External SearchTome evaluation |
-| `bench_library.py` | Multi-document retrieval evaluation |
-| `bench_hybrid.py` | Hybrid search and reranking experiments |
+| `gemma.py` | Embedding, chunking, and semantic ranking |
+| `core.py` | Original retrieval pipeline and FastAPI `/ask` endpoint |
+| `benchmarks/` | Book, core, SearchTome, library and hybrid evaluations |
 | `results/` | Recorded benchmark results |
+| `requirements.txt` | Retrieval stack |
+| `requirements-agastya-rag.txt` | Pinned unsloth/torch stack for the local decision model |
 
 Book PDFs are not distributed with the repository because redistribution rights are not held for those documents.
 

@@ -1,0 +1,48 @@
+# agastya_rag.py — typed-decision inference (unsloth FastDecisionModel)
+#
+# Install with the system Python 3.14 (PEP 668 managed, so --user --break-system-packages):
+#   /usr/bin/python3.14 -m pip install --user --break-system-packages -r requirements-agastya-rag.txt
+#
+# Then, from the repo root (the script's model path is relative):
+#   /usr/bin/python3.14 agastya_rag.py
+#
+# These are the versions this box actually resolved and installed on Python 3.14.
+# unsloth 2026.11.2 pins torch<2.15.0, and cp314 wheels start at torch 2.14.1 —
+# that pairing is what makes Python 3.14 work at all. Do not bump torch past 2.14.x.
+
+unsloth==2026.11.2
+torch==2.14.1
+torchvision==0.29.2
+transformers==5.17.0
+accelerate==1.15.0
+bitsandbytes==0.50.2
+xformers==0.0.35
+triton==3.8.0
+
+# Pulled in transitively by unsloth, listed for reproducibility of the verified install.
+numpy==2.5.4
+safetensors==0.8.0
+tokenizers==0.23.3
+huggingface_hub==1.33.0
+peft==0.21.2
+trl==1.15.0
+datasets==4.8.5
+
+# ---------------------------------------------------------------------------
+# Optional: causal_conv1d GPU kernel for Qwen3.5's linear-attention convs.
+# transformers uses it when importable (else falls back to torch conv1d).
+#
+# There is NO wheel for cp314/cu130 on PyPI or GitHub, so it must be built from
+# source. The system nvcc is 12.4 and cannot build against torch cu130, so the
+# nvcc 13.5 pip wheel supplies the toolchain. setup.py compiles 9 architectures
+# by default (hours); trim its "-gencode" list to sm_75 for this GPU first.
+#
+#   /usr/bin/python3.14 -m pip install --user --break-system-packages nvidia-cuda-nvcc==13.5.37
+#   curl -sSLO https://files.pythonhosted.org/packages/f4/d1/eba27735f31bd5527d39a3c7f693e6ded7b844cab275db719a15ad37b6cd/causal_conv1d-1.7.0.tar.gz
+#   tar xzf causal_conv1d-1.7.0.tar.gz && edit setup.py -> keep only arch=compute_75,code=sm_75
+#   cd causal_conv1d-1.7.0 && CUDA_HOME=$HOME/.local/lib/python3.14/site-packages/nvidia/cu13 \
+#     MAX_JOBS=1 /usr/bin/python3.14 -m pip install --user --break-system-packages --no-build-isolation .
+#
+# Verify: python3.14 -c "import causal_conv1d; print(causal_conv1d.__version__)"
+# ---------------------------------------------------------------------------
+

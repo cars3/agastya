@@ -29,8 +29,8 @@ section on cache set associativity." Claude Code calls `config` once, then
 `query` on later questions.
 
 Working inside the agastya checkout? The bundled skill at
-`agent-instructions/SKILL.md` teaches the retrieval workflow; reference it
-from `CLAUDE.md` or ask Claude to read it.
+`agent-instructions/SKILL.md` teaches the retrieval workflow; ask Claude to
+read it.
 
 ## Verify
 

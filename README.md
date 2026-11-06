@@ -197,14 +197,14 @@ The older `core.py` HTTP service and benchmark scripts still import the removed
 This repository carries native instructions for coding agents:
 
 - `agent-instructions/` — all agent-facing material in one folder
-- `agent-instructions/AGENTS.md` — the canonical guide, imported by the root
-  `CLAUDE.md`, `CODEX.md`, `OPENCODE.md`, and `KIMI.md` pointers
+- `agent-instructions/AGENTS.md` — the canonical guide, the only instruction
+  file; point your agent at it directly
 - `agent-instructions/SKILL.md` — the canonical skill, the only skill file
   in the repo; `AGENTS.md` tells every agent to read it
 - `agent-instructions/agents/` — per-agent connection guides
 
-Open this repo in your agent of choice, and it will know how to set agastya
-up.
+Point your agent at `agent-instructions/AGENTS.md`, and it will know how to
+set agastya up.
 
 ## Running the Benchmarks
 

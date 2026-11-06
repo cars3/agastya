@@ -31,8 +31,8 @@ Headless workers use `codex exec`:
 codex exec "Use agastya to query the active index for the cache replacement policy"
 ```
 
-Working inside the agastya checkout, Codex loads the root `AGENTS.md`, which
-imports `agent-instructions/AGENTS.md` — that points at the agastya skill.
+Working inside the agastya checkout, point Codex at
+`agent-instructions/AGENTS.md` — that points at the agastya skill.
 
 ## Verify
 

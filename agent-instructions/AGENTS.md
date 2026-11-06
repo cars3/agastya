@@ -8,10 +8,9 @@ This file is the canonical instruction file for AI coding agents working in,
 with, or on this repository. It lives in `agent-instructions/` together with
 the agent skill and the per-agent connection guides.
 
-The repository root carries thin pointers (`AGENTS.md`, `CLAUDE.md`,
-`CODEX.md`, `KIMI.md`, `OPENCODE.md`) that import this file. They exist only
-so every agent still discovers the instructions; there are no per-agent
-skill directories. Edit the files here, never the root pointers.
+There are no agent instruction files at the repository root and no
+per-company copies. This is the only instruction file; `SKILL.md` sits next
+to it.
 
 ## What this server provides
 

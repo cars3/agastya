@@ -32,4 +32,4 @@ grok mcp doctor agastya     # connectivity check
   and project `.mcp.json` files (compatibility), merged below its own
   `config.toml`.
 - Working inside the agastya checkout? The bundled skill is at
-  `.grok/skills/agastya/SKILL.md`.
+  `agent-instructions/SKILL.md`.

@@ -1,1 +1,0 @@
-../../../.agents/skills/agastya/SKILL.md

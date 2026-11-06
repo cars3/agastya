@@ -28,9 +28,9 @@ Ask naturally: "Use agastya to index the PDFs in /data/manuals, then find the
 section on cache set associativity." Claude Code calls `config` once, then
 `query` on later questions.
 
-Working inside the agastya checkout? Claude Code also auto-discovers the
-bundled skill at `.claude/skills/agastya/SKILL.md`, which teaches the
-retrieval workflow.
+Working inside the agastya checkout? The bundled skill at
+`agent-instructions/SKILL.md` teaches the retrieval workflow; reference it
+from `CLAUDE.md` or ask Claude to read it.
 
 ## Verify
 

@@ -199,8 +199,8 @@ This repository carries native instructions for coding agents:
 - `agent-instructions/` — all agent-facing material in one folder
 - `agent-instructions/AGENTS.md` — the canonical guide, imported by the root
   `CLAUDE.md`, `CODEX.md`, `OPENCODE.md`, and `KIMI.md` pointers
-- `agent-instructions/.agents/skills/agastya/SKILL.md` — the canonical skill,
-  symlinked into each agent's skills directory so every CLI auto-discovers it
+- `agent-instructions/SKILL.md` — the canonical skill, the only skill file
+  in the repo; `AGENTS.md` tells every agent to read it
 - `agent-instructions/agents/` — per-agent connection guides
 
 Open this repo in your agent of choice, and it will know how to set agastya

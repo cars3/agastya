@@ -9,11 +9,9 @@ with, or on this repository. It lives in `agent-instructions/` together with
 the agent skill and the per-agent connection guides.
 
 The repository root carries thin pointers (`AGENTS.md`, `CLAUDE.md`,
-`CODEX.md`, `KIMI.md`, `OPENCODE.md`) that import this file, plus symlinked
-agent directories (`.agents`, `.claude`, `.antigravitycli`, `.grok`,
-`.kimi`, `.opencode`, `.qwen`) that point into this folder. Those exist only
-so every agent still auto-discovers the instructions. Edit the files here,
-never the root pointers or symlinks.
+`CODEX.md`, `KIMI.md`, `OPENCODE.md`) that import this file. They exist only
+so every agent still discovers the instructions; there are no per-agent
+skill directories. Edit the files here, never the root pointers.
 
 ## What this server provides
 
@@ -94,15 +92,15 @@ verification step.
   quote.
 - `decide` is optional and does not replace reading the retrieved evidence.
 
-Full guidance: `agent-instructions/.agents/skills/agastya/SKILL.md`.
+Full guidance: `agent-instructions/SKILL.md`.
 
 ## Repository layout
 
 ```
-agent-instructions/                agent instructions: readmes, skill, connection guides
+agent-instructions/                agent instructions: readmes, skill, guides
 agent-instructions/AGENTS.md       this file, the canonical guide
+agent-instructions/SKILL.md        the one canonical agent skill
 agent-instructions/agents/         per-agent connection guides
-agent-instructions/.agents/skills/agastya/  canonical agent skill
 main.py                            corpus build + MCP server (config, query, decide)
 gemma.py                           embedding, chunking, semantic ranking
 split_pdf.py                       PDF outline extraction and document splitting
@@ -121,7 +119,5 @@ results/                           recorded benchmark results
 - The MCP `query` path is dense-only; the published benchmarks describe a
   hierarchy walk the MCP server does not currently perform. Describe it
   accurately.
-- The root agent directories are symlinks to `agent-instructions/`. Inside
-  that folder, each agent's `skills/agastya/SKILL.md` is a symlink to
-  `.agents/skills/agastya/SKILL.md` — edit the canonical skill only, never
-  the symlinks or the root pointers.
+- The same `AGENTS.md` and `SKILL.md` serve every agent. Do not add
+  per-agent skill directories or duplicate the skill; update this folder.

@@ -23,5 +23,5 @@ Cursor → Settings → MCP should list agastya as connected. Then ask the Agent
 ## Notes
 
 - Cursor prompts for approval on tool calls by default.
-- Working inside the agastya checkout, Cursor auto-discovers the bundled
-  skill from the shared `agent-instructions/.agents/skills/agastya/` layout.
+- The bundled skill lives at `agent-instructions/SKILL.md`; reference it
+  from a Cursor rule if you want it loaded automatically.

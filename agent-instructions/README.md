@@ -14,16 +14,13 @@ Agastya.
 | [KIMI.md](KIMI.md) | Kimi entrypoint, imports `AGENTS.md` |
 | [OPENCODE.md](OPENCODE.md) | OpenCode entrypoint, imports `AGENTS.md` |
 | [agents/](agents/) | Per-agent MCP connection guides (config path + snippet + verification) |
-| [.agents/skills/agastya/SKILL.md](.agents/skills/agastya/SKILL.md) | Canonical agent skill: how to use the agastya tools well |
+| [SKILL.md](SKILL.md) | The one canonical agent skill: how to use the agastya tools well |
 
 ## How the root stays wired
 
-The repository root carries thin pointers and symlinks so agent CLIs still
-auto-discover these files:
+The repository root carries thin pointers (`AGENTS.md`, `CLAUDE.md`,
+`CODEX.md`, `KIMI.md`, `OPENCODE.md`) that import `AGENTS.md` here. They
+exist only so agent CLIs still discover the instructions.
 
-- `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `KIMI.md`, `OPENCODE.md` at the root
-  import or point at this folder.
-- `.agents`, `.claude`, `.antigravitycli`, `.grok`, `.kimi`, `.opencode`, and
-  `.qwen` at the root are symlinks to the matching directories here.
-
-Edit files in this folder only. Never edit a root pointer or a skill symlink.
+There are no per-agent skill directories. Every agent reads the same
+`SKILL.md` in this folder. Edit files here only; never edit a root pointer.

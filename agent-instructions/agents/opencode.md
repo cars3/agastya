@@ -19,9 +19,8 @@ OpenCode uses the `mcp` key (not `mcpServers`), and every entry needs a
 }
 ```
 
-Working inside the agastya checkout, the bundled slash command
-`.opencode/commands/agastya.md` is auto-registered — `/agastya` loads the
-skill.
+Working inside the agastya checkout, the skill lives at
+`agent-instructions/SKILL.md`; OpenCode can load it from there when asked.
 
 ## Verify
 

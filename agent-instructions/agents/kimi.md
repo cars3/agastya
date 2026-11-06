@@ -21,9 +21,8 @@ form on your version.
 
 ## Skills
 
-Kimi merges skills from all brand directories by default
-(`merge_all_available_skills: true`), so the bundled skill at
-`.kimi/skills/agastya/SKILL.md` is available when working inside the repo.
+The bundled skill lives at `agent-instructions/SKILL.md`; Kimi can load it
+when working inside the repo.
 
 ## Verify
 

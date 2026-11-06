@@ -32,8 +32,8 @@ agy mcp add agastya -- /absolute/path/to/agastya/.venv/bin/agastya --mcp
 
 ## Skills
 
-Working inside the agastya checkout, Antigravity auto-discovers the bundled
-skill at `.antigravitycli/skills/agastya/SKILL.md`.
+The bundled skill is `agent-instructions/SKILL.md`; point Antigravity at it
+if you want the retrieval workflow loaded.
 
 ## Verify
 

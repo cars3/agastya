@@ -16,6 +16,5 @@ pi mcp list      # agastya should appear with 3 tools
 
 ## Skills
 
-Working inside the agastya checkout, Pi auto-discovers the skill from
-`agent-instructions/.agents/skills/agastya/` and exposes it as
-`/skill:agastya`.
+The bundled skill lives at `agent-instructions/SKILL.md`; Pi can load it
+directly when working inside the checkout.

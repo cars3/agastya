@@ -23,7 +23,7 @@ Always answers with the same shape, whichever backend ran:
 
     {
       "backend": "local",
-      "model": "unsloth_Qwen3.5-2B__project-agastya-rag_1793806165",
+      "model": "amartya16/Agastya-RAG-2B",
       "latency_ms": 412.7,
       "answers": {
         "intent": {"type": "choice", "answer": "billing", "confidence": 0.5266,

@@ -310,7 +310,7 @@ def make_server():
             "Agastya builds a ToC-structured index from PDF books and answers "
             "questions over it. Call config(folder) once to build/select an index, "
             "then query(question). Use decide(...) for typed decisions through the "
-            "cloud (Jev) or local (unsloth) decision model."
+            "cloud (Jev) or local (Hugging Face) decision model."
         ),
     )
 

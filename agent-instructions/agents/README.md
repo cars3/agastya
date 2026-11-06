@@ -49,5 +49,7 @@ work with any MCP client once you know its config file format.
 
 PDF retrieval needs no API keys. The optional cloud decision backend needs
 `TYPESAFE_API_KEY` in the server's environment; the optional local decision
-backend needs a compatible Unsloth checkpoint. Neither is required for
-`config` or `query`.
+backend downloads the
+[amartya16/Agastya-RAG-2B](https://huggingface.co/amartya16/Agastya-RAG-2B)
+checkpoint from Hugging Face on first use. Neither is required for `config`
+or `query`.

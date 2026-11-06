@@ -43,9 +43,12 @@ Scores and the relevance verdict are heuristics, not calibrated
 probabilities. Do not present them as confidence.
 
 ### decide(state, questions, backend="local") -> dict
-Runs a typed decision (choice / score / noul) through the local unsloth model
-or the cloud Jev backend. Optional: the `decision` extra and a configured
-backend are required.
+Runs a typed decision (choice / score / noul). Two backends, same output:
+`local` (default) downloads the
+[amartya16/Agastya-RAG-2B](https://huggingface.co/amartya16/Agastya-RAG-2B)
+checkpoint from Hugging Face on first use (about 4.6GB; needs the `decision`
+extra and unsloth); `cloud` calls TypeSafe Jev and needs `TYPESAFE_API_KEY`.
+Optional: retrieval never requires it.
 
 ## Recommended workflow
 

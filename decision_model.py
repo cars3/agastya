@@ -42,7 +42,9 @@ Run:
 
 Setup:
     cloud  needs jev_key=apikey_... in .env (or TYPESAFE_API_KEY)
-    local  needs the checkpoint beside this file (see LOCAL_MODEL_DIR below)
+    local  downloads amartya16/Agastya-RAG-2B from Hugging Face on first use
+           (~4.6GB); DECISION_MODEL_DIR (path) or DECISION_MODEL_ID (hub id)
+           override the source
 """
 
 from __future__ import annotations
@@ -63,10 +65,35 @@ from typesafe_sdk import TypeSafeClient
 
 BASE = Path(__file__).resolve().parent
 CLOUD_MODEL = "jev-latest"
-LOCAL_MODEL_DIR = Path(
-    os.environ.get("DECISION_MODEL_DIR")
-    or BASE / "unsloth_Qwen3.5-2B__project-agastya-rag_1793806165"
-)
+# Default local checkpoint. FastDecisionModel.from_pretrained accepts this hub
+# id directly and downloads/caches it on first use (~4.6GB, Apache-2.0).
+LOCAL_MODEL_ID = os.environ.get("DECISION_MODEL_ID", "amartya16/Agastya-RAG-2B")
+# Older checkouts kept the checkpoint beside this file; keep honoring that
+# without forcing a 4.6GB re-download on machines that already have it.
+LEGACY_MODEL_DIR = BASE / "unsloth_Qwen3.5-2B__project-agastya-rag_1793806165"
+
+
+def local_model_source() -> tuple[str, bool]:
+    """Return (source, is_hub).
+
+    Priority: DECISION_MODEL_DIR (explicit path) > legacy beside-file
+    checkpoint > the Hugging Face hub id, which downloads on first use.
+    """
+    override = os.environ.get("DECISION_MODEL_DIR")
+    if override:
+        return str(Path(override).expanduser()), False
+    if LEGACY_MODEL_DIR.is_dir():
+        return str(LEGACY_MODEL_DIR), False
+    return LOCAL_MODEL_ID, True
+
+
+def _hub_checkpoint_cached() -> bool:
+    """True when the default hub checkpoint already exists in the HF cache."""
+    try:
+        from huggingface_hub import try_to_load_from_cache
+    except Exception:  # noqa: BLE001 - missing hub lib just means "not cached"
+        return False
+    return isinstance(try_to_load_from_cache(LOCAL_MODEL_ID, "config.json"), str)
 
 Backend = Literal["cloud", "local"]
 
@@ -220,10 +247,11 @@ def _load_local():
     with _local_lock:
         if _local_model is not None:
             return _local_model, _local_tokenizer
-        if not LOCAL_MODEL_DIR.is_dir():
+        source, is_hub = local_model_source()
+        if not is_hub and not Path(source).is_dir():
             raise HTTPException(
                 status_code=503,
-                detail=f"Local backend unavailable: checkpoint not found at {LOCAL_MODEL_DIR}",
+                detail=f"Local backend unavailable: checkpoint not found at {source}",
             )
         try:
             from unsloth import FastDecisionModel
@@ -234,8 +262,10 @@ def _load_local():
             ) from error
 
         try:
+            # `source` is either a local checkpoint directory or a Hugging Face
+            # repo id, which from_pretrained downloads and caches on first use.
             model, tokenizer = FastDecisionModel.from_pretrained(
-                model_name=str(LOCAL_MODEL_DIR),
+                model_name=source,
                 max_seq_length=2048,
                 # The checkpoint was trained 4-bit; fp32 is ~8.5 GB and will OOM
                 # on an 8 GB card before inference starts.
@@ -249,7 +279,7 @@ def _load_local():
             ) from error
 
         _local_model, _local_tokenizer = model, tokenizer
-        _local_model_name = LOCAL_MODEL_DIR.name
+        _local_model_name = LOCAL_MODEL_ID if is_hub else Path(source).name
         return _local_model, _local_tokenizer
 
 
@@ -290,6 +320,7 @@ PREDICTORS = {"cloud": predict_cloud, "local": predict_local}
 
 @app.get("/health")
 def health() -> dict[str, Any]:
+    source, is_hub = local_model_source()
     return {
         "ok": True,
         "backends": {
@@ -299,8 +330,12 @@ def health() -> dict[str, Any]:
             },
             "local": {
                 "loaded": _local_model is not None,
-                "model": LOCAL_MODEL_DIR.name,
-                "checkpoint_present": LOCAL_MODEL_DIR.is_dir(),
+                "model": _local_model_name
+                or (LOCAL_MODEL_ID if is_hub else Path(source).name),
+                "source": source,
+                "checkpoint_present": _hub_checkpoint_cached()
+                if is_hub
+                else Path(source).is_dir(),
             },
         },
     }

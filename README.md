@@ -39,81 +39,6 @@ The goal isn't simply to retrieve the single highest-ranking result. It's to giv
 
 This makes Agastya particularly useful for agents working with long technical documents where accuracy, source traceability, and frequent document updates matter.
 
-## Performance at a Glance
-
-| Metric | Measured result |
-| --- | --- |
-| SearchTome benchmark | 6,005 queries across 6 domains |
-| Gold-section recall | 89.1% |
-| Average retrieval budget | 3.6 sections/query |
-| Deep textbook retrieval | 95% leaf hit rate |
-| NIST SP 800-53 retrieval | 93.3% leaf hit rate |
-| Median latency on deep textbook | 0.42 seconds |
-| Tested hardware | RTX 2060 SUPER, 8GB VRAM |
-| Model fine-tuning | None |
-| Empty retrieval results | Zero in evaluated runs |
-
-These measurements cover distinct evaluation settings. SearchTome provides an external benchmark, while the deep textbook and NIST evaluations test navigation over larger hierarchical documents.
-
-## Benchmarks
-
-### SearchTome: 6,005 Queries
-
-Evaluation on the complete public SearchTome release across six domains.
-
-| Retrieval system | Recall@1 | Recall@3 | Gold recall at retrieval budget |
-| --- | --- | --- | --- |
-| BM25 | 47.8% | 68.1% | — |
-| Jev-only ranking | 54.2% | 75.7% | — |
-| EmbeddingGemma 2 | 64.2% | 84.5% | 84.5% at 3 leaves |
-| Agastya RAG | 64.2% | 84.5% | 89.1% at 3.6 leaves |
-
-Agastya does not improve the top-one ranking over EmbeddingGemma in this evaluation. Its improvement comes from expanding the relevant candidate set while maintaining a small retrieval budget.
-
-### Deep Document Evaluation
-
-Tested on a 389-leaf textbook.
-
-| Configuration | Leaf hit rate | Leaves/query | Median latency |
-| --- | --- | --- | --- |
-| Strict Jev hierarchy walk | 45% | 1.5 | 0.54s |
-| Agastya combined pipeline | 95% | 4.2 | 0.42s |
-
-This demonstrates why combining semantic retrieval with hierarchical navigation matters: a structural walk alone can prune away the correct answer, while the embedding union can recover it.
-
-### Enterprise Compliance Evaluation
-
-Tested using NIST SP 800-53 Revision 5, organized into 331 control sections.
-
-| System | Result |
-| --- | --- |
-| Dense EmbeddingGemma | 81.7% Recall@1 |
-| Dense EmbeddingGemma | 93.3% Recall@3 |
-| Agastya RAG | 93.3% leaf hit at 5.5 leaves |
-| Agastya median latency | 0.40s |
-
-These results demonstrate practical retrieval on a structured regulatory corpus without domain-specific model fine-tuning.
-
-## Agastya vs. IBM STAIR
-
-Both recognize that document hierarchies contain useful information that traditional flat retrieval systems often ignore.
-
-However, they make different engineering tradeoffs.
-
-| Capability | Agastya RAG | IBM STAIR |
-| --- | --- | --- |
-| Document navigation | Inference-time hierarchy walk | Fine-tuned generative index |
-| Training required | No | Yes |
-| New document ingestion | Split and embed | Requires index-model preparation/training |
-| Corpus updates | Reprocess affected documents | Update trained index |
-| Structural traceability | Explicit navigation and pruning log | Model-generated section identifiers |
-| Local hardware | Tested on 8GB GPU | Training infrastructure required |
-| Primary strength | Training-free, adaptable retrieval | High top-one retrieval accuracy |
-
-Its advantage is offering practical hierarchical retrieval without requiring a new training pipeline for each document collection.
-
-For applications with stable corpora and strict top-one retrieval requirements, a trained system such as STAIR may be preferable.
-
 ## Getting Started
 
 Install from a checkout into a virtual environment (Python 3.10 or newer):
@@ -181,16 +106,110 @@ The MCP query currently ranks sections and chunks with dense embeddings; it
 does not perform the hierarchy walk used in the earlier benchmarks. Scores and
 the optional relevance verdict are heuristics, not calibrated probabilities.
 
-For Parquet output install `pip install '.[parquet]'`. For typed decisions,
-install `pip install '.[decision]'`. The cloud backend additionally needs
-`TYPESAFE_API_KEY` in the agent's environment. The local backend requires a
-compatible Unsloth installation and checkpoint; set `DECISION_MODEL_DIR` to
-its absolute path. See `requirements-agastya-rag.txt` for the original
-machine-specific GPU environment. These optional backends are not required for
-PDF retrieval.
+For Parquet output install `pip install '.[parquet]'`.
+
+### Decision model (optional)
+
+`decide` answers typed questions (choice / score / noul) through one of two
+backends with identical output shapes:
+
+- **Local (default):** the checkpoint
+  [amartya16/Agastya-RAG-2B](https://huggingface.co/amartya16/Agastya-RAG-2B),
+  a Qwen3.5-2B with an Unsloth decision head (Apache-2.0, about 4.6GB),
+  downloads from Hugging Face on the first local `decide` call and is cached
+  by `huggingface_hub`. Requires the decision extra plus a compatible Unsloth
+  install: `pip install '.[decision]' 'unsloth==2026.11.2'`. To prefetch the
+  weights:
+
+  ```bash
+  hf download amartya16/Agastya-RAG-2B
+  ```
+
+- **Cloud:** TypeSafe Jev. Set `TYPESAFE_API_KEY` (or `jev_key=apikey_...` in
+  `.env`) in the server environment.
+
+`DECISION_MODEL_ID` selects a different Hugging Face checkpoint;
+`DECISION_MODEL_DIR` points at a local checkpoint directory. See
+`requirements-agastya-rag.txt` for the original machine-specific GPU
+environment. Neither backend is required for PDF retrieval.
 
 The older `core.py` HTTP service and benchmark scripts still import the removed
 `jev` module and are not currently supported by the MCP installation.
+
+## Performance at a Glance
+
+| Metric | Measured result |
+| --- | --- |
+| SearchTome benchmark | 6,005 queries across 6 domains |
+| Gold-section recall | 89.1% |
+| Average retrieval budget | 3.6 sections/query |
+| Deep textbook retrieval | 95% leaf hit rate |
+| NIST SP 800-53 retrieval | 93.3% leaf hit rate |
+| Median latency on deep textbook | 0.42 seconds |
+| Tested hardware | RTX 2060 SUPER, 8GB VRAM |
+| Model fine-tuning | None |
+| Empty retrieval results | Zero in evaluated runs |
+
+These measurements cover distinct evaluation settings. SearchTome provides an external benchmark, while the deep textbook and NIST evaluations test navigation over larger hierarchical documents.
+
+## Benchmarks
+
+### SearchTome: 6,005 Queries
+
+Evaluation on the complete public SearchTome release across six domains.
+
+| Retrieval system | Recall@1 | Recall@3 | Gold recall at retrieval budget |
+| --- | --- | --- | --- |
+| BM25 | 47.8% | 68.1% | - |
+| Jev-only ranking | 54.2% | 75.7% | - |
+| EmbeddingGemma 2 | 64.2% | 84.5% | 84.5% at 3 leaves |
+| Agastya RAG | 64.2% | 84.5% | 89.1% at 3.6 leaves |
+
+Agastya does not improve the top-one ranking over EmbeddingGemma in this evaluation. Its improvement comes from expanding the relevant candidate set while maintaining a small retrieval budget.
+
+### Deep Document Evaluation
+
+Tested on a 389-leaf textbook.
+
+| Configuration | Leaf hit rate | Leaves/query | Median latency |
+| --- | --- | --- | --- |
+| Strict Jev hierarchy walk | 45% | 1.5 | 0.54s |
+| Agastya combined pipeline | 95% | 4.2 | 0.42s |
+
+This demonstrates why combining semantic retrieval with hierarchical navigation matters: a structural walk alone can prune away the correct answer, while the embedding union can recover it.
+
+### Enterprise Compliance Evaluation
+
+Tested using NIST SP 800-53 Revision 5, organized into 331 control sections.
+
+| System | Result |
+| --- | --- |
+| Dense EmbeddingGemma | 81.7% Recall@1 |
+| Dense EmbeddingGemma | 93.3% Recall@3 |
+| Agastya RAG | 93.3% leaf hit at 5.5 leaves |
+| Agastya median latency | 0.40s |
+
+These results demonstrate practical retrieval on a structured regulatory corpus without domain-specific model fine-tuning.
+
+## Agastya vs. IBM STAIR
+
+Both recognize that document hierarchies contain useful information that traditional flat retrieval systems often ignore.
+
+However, they make different engineering tradeoffs.
+
+| Capability | Agastya RAG | IBM STAIR |
+| --- | --- | --- |
+| Document navigation | Inference-time hierarchy walk | Fine-tuned generative index |
+| Training required | No | Yes |
+| New document ingestion | Split and embed | Requires index-model preparation/training |
+| Corpus updates | Reprocess affected documents | Update trained index |
+| Structural traceability | Explicit navigation and pruning log | Model-generated section identifiers |
+| Local hardware | Tested on 8GB GPU | Training infrastructure required |
+| Primary strength | Training-free, adaptable retrieval | High top-one retrieval accuracy |
+
+Its advantage is offering practical hierarchical retrieval without requiring a new training pipeline for each document collection.
+
+For applications with stable corpora and strict top-one retrieval requirements, a trained system such as STAIR may be preferable.
 
 ## For AI agents
 
@@ -204,7 +223,7 @@ This repository carries native instructions for coding agents:
 - `agent-instructions/agents/` — per-agent connection guides
 
 Point your agent at `agent-instructions/AGENTS.md`, and it will know how to
-set agastya up.
+set agastya up, including the optional decision model download.
 
 ## Running the Benchmarks
 
@@ -255,7 +274,7 @@ Raw benchmark measurements are stored in `results/`.
 | --- | --- |
 | `main.py` | Corpus build from every PDF, plus the MCP server (`config`, `query`, `decide`) |
 | `agent-instructions/` | Agent readmes, the agent skill, and per-agent MCP connection guides |
-| `decision_model.py` | One `/decide` endpoint over cloud Jev or the local unsloth model, identical output |
+| `decision_model.py` | One `/decide` endpoint over cloud Jev or the local Hugging Face checkpoint (`amartya16/Agastya-RAG-2B`), identical output |
 | `split_pdf.py` | PDF outline extraction and document splitting |
 | `gemma.py` | Embedding, chunking, and semantic ranking |
 | `core.py` | Original retrieval pipeline and FastAPI `/ask` endpoint |

@@ -173,6 +173,10 @@ in memory, and repeats that work after a server restart.
 | `query(question, leaf, relevant_match)` | Retrieve relevant sections or chunks. |
 | `decide(state, questions, backend)` | Run an optional typed decision backend. |
 
+Per-agent registration guides — exact config file, snippet, and verification
+step for each client — live in
+[agent-instructions/agents/](agent-instructions/agents/).
+
 The MCP query currently ranks sections and chunks with dense embeddings; it
 does not perform the hierarchy walk used in the earlier benchmarks. Scores and
 the optional relevance verdict are heuristics, not calibrated probabilities.
@@ -187,6 +191,20 @@ PDF retrieval.
 
 The older `core.py` HTTP service and benchmark scripts still import the removed
 `jev` module and are not currently supported by the MCP installation.
+
+## For AI agents
+
+This repository carries native instructions for coding agents:
+
+- `agent-instructions/` — all agent-facing material in one folder
+- `agent-instructions/AGENTS.md` — the canonical guide, imported by the root
+  `CLAUDE.md`, `CODEX.md`, `OPENCODE.md`, and `KIMI.md` pointers
+- `agent-instructions/.agents/skills/agastya/SKILL.md` — the canonical skill,
+  symlinked into each agent's skills directory so every CLI auto-discovers it
+- `agent-instructions/agents/` — per-agent connection guides
+
+Open this repo in your agent of choice, and it will know how to set agastya
+up.
 
 ## Running the Benchmarks
 
@@ -236,6 +254,7 @@ Raw benchmark measurements are stored in `results/`.
 | Component | Responsibility |
 | --- | --- |
 | `main.py` | Corpus build from every PDF, plus the MCP server (`config`, `query`, `decide`) |
+| `agent-instructions/` | Agent readmes, the agent skill, and per-agent MCP connection guides |
 | `decision_model.py` | One `/decide` endpoint over cloud Jev or the local unsloth model, identical output |
 | `split_pdf.py` | PDF outline extraction and document splitting |
 | `gemma.py` | Embedding, chunking, and semantic ranking |

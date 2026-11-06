@@ -96,7 +96,7 @@ in memory, and repeats that work after a server restart.
 | --- | --- |
 | `config(folder, model, out, parquet)` | Build and select an index; Parquet is off by default. |
 | `query(question, leaf, relevant_match)` | Retrieve relevant sections or chunks. |
-| `decide(state, questions, backend)` | Run an optional typed decision backend. |
+| `decide(state, questions, backend)` | Run a typed decision (default: the local decision model). |
 
 Per-agent registration guides — exact config file, snippet, and verification
 step for each client — live in
@@ -108,10 +108,11 @@ the optional relevance verdict are heuristics, not calibrated probabilities.
 
 For Parquet output install `pip install '.[parquet]'`.
 
-### Decision model (optional)
+### Decision model
 
-`decide` answers typed questions (choice / score / noul) through one of two
-backends with identical output shapes:
+`decide` runs on the decision model by default: it answers typed questions
+(choice / score / noul) with probabilities through one of two backends that
+share identical output shapes.
 
 - **Local (default):** the checkpoint
   [amartya16/Agastya-RAG-2B](https://huggingface.co/amartya16/Agastya-RAG-2B),
@@ -131,7 +132,7 @@ backends with identical output shapes:
 `DECISION_MODEL_ID` selects a different Hugging Face checkpoint;
 `DECISION_MODEL_DIR` points at a local checkpoint directory. See
 `requirements-agastya-rag.txt` for the original machine-specific GPU
-environment. Neither backend is required for PDF retrieval.
+environment.
 
 The older `core.py` HTTP service and benchmark scripts still import the removed
 `jev` module and are not currently supported by the MCP installation.
@@ -223,7 +224,7 @@ This repository carries native instructions for coding agents:
 - `agent-instructions/agents/` — per-agent connection guides
 
 Point your agent at `agent-instructions/AGENTS.md`, and it will know how to
-set agastya up, including the optional decision model download.
+set agastya up, including the decision model download.
 
 ## Running the Benchmarks
 

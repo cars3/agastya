@@ -68,22 +68,15 @@ CLOUD_MODEL = "jev-latest"
 # Default local checkpoint. FastDecisionModel.from_pretrained accepts this hub
 # id directly and downloads/caches it on first use (~4.6GB, Apache-2.0).
 LOCAL_MODEL_ID = os.environ.get("DECISION_MODEL_ID", "amartya16/Agastya-RAG-2B")
-# Older checkouts kept the checkpoint beside this file; keep honoring that
-# without forcing a 4.6GB re-download on machines that already have it.
-LEGACY_MODEL_DIR = BASE / "unsloth_Qwen3.5-2B__project-agastya-rag_1793806165"
-
-
 def local_model_source() -> tuple[str, bool]:
     """Return (source, is_hub).
 
-    Priority: DECISION_MODEL_DIR (explicit path) > legacy beside-file
-    checkpoint > the Hugging Face hub id, which downloads on first use.
+    Priority: DECISION_MODEL_DIR (explicit path) > the Hugging Face hub id,
+    which downloads on first use.
     """
     override = os.environ.get("DECISION_MODEL_DIR")
     if override:
         return str(Path(override).expanduser()), False
-    if LEGACY_MODEL_DIR.is_dir():
-        return str(LEGACY_MODEL_DIR), False
     return LOCAL_MODEL_ID, True
 
 

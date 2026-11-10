@@ -229,7 +229,7 @@ def split_pdf(
     doc = pymupdf.open(pdf_path)
     toc = doc.get_toc(simple=True)
     if not toc:
-        raise ValueError(f"{pdf_path.name} has no embedded outline; cannot build a section tree")
+        raise ValueError(f"{pdf_path.name} has no embedded outline; cannot build a section tree. Agastya builds its tree from PDF bookmarks. Add bookmarks in a PDF editor (or with pymupdf set_toc) and rerun.")
 
     roots = build_tree(match_toc(doc, toc))
     doc_id = doc_id or slug(pdf_path.stem)
@@ -311,6 +311,7 @@ def split_pdf(
         "nodes": len(flat),
         "levels": levels,
         "leaves": len(leaves),
+        "empty_leaves": sum(1 for leaf in leaves if leaf["chars"] == 0),
         "unmatched_headings": sum(1 for n, _ in flat if not n.matched),
         "skipped_backmatter": skipped,
         "leaf_chars_min": lengths[0],

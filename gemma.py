@@ -5,7 +5,8 @@ and rank them against a query with cosine similarity.
 
 Model : google/embeddinggemma-2 (740M params, text backbone only here)
 Dims  : 768 (Matryoshka: 512 / 256 / 128 also supported)
-Runs  : CUDA when available (bf16 on Ampere+, fp32 on Turing and CPU).
+Runs  : CUDA when available (bf16 on Ampere+, fp32 on Turing and CPU), or mps.
+        AMD ROCm builds report as cuda.
         Never float16: the model overflows it and silently returns NaN/garbage.
 
 Setup:
@@ -22,13 +23,13 @@ If another process is using the GPU, force CPU:
 
 from __future__ import annotations
 
-import os
 import re
 import time
 
 import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer
+from device import pick_device
 
 MODEL_ID = "google/embeddinggemma-2"
 SENTENCES_PER_CHUNK = 3   # chunk = this many sentences, whatever their length
@@ -36,10 +37,10 @@ SENTENCE_OVERLAP = 1      # sentences repeated at the start of the next chunk
 MAX_CHUNK_CHARS = 1200    # hard-split sentences longer than this (tables, dense runs)
 TOP_K = 5
 
-DEVICE = os.getenv("GEMMA_DEVICE") or ("cuda" if torch.cuda.is_available() else "cpu")
+DEVICE = pick_device()
 # float16 is unsafe here (EmbeddingGemma 2 overflows it and returns NaN or silent
 # garbage). bfloat16 needs Ampere or newer; Turing (RTX 20xx) falls back to fp32.
-if DEVICE == "cuda" and torch.cuda.get_device_capability(0)[0] >= 8:
+if DEVICE == "cuda" and torch.cuda.is_available() and torch.cuda.get_device_capability(0)[0] >= 8:
     DTYPE = torch.bfloat16
 else:
     DTYPE = torch.float32

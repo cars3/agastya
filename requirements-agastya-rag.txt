@@ -1,5 +1,10 @@
 # agastya_rag.py — typed-decision inference (unsloth FastDecisionModel)
 #
+# This is the DECISION environment only. It pins transformers==5.17.0 and
+# cannot serve the embedding model (embeddinggemma-2 needs transformers>=5.19),
+# so it must live in its own virtualenv. Serve decision_model.py from here and
+# set DECISION_URL in the MCP server environment.
+#
 # Install with the system Python 3.14 (PEP 668 managed, so --user --break-system-packages):
 #   /usr/bin/python3.14 -m pip install --user --break-system-packages -r requirements-agastya-rag.txt
 #

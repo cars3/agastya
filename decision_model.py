@@ -44,7 +44,12 @@ Setup:
     cloud  needs jev_key=apikey_... in .env (or TYPESAFE_API_KEY)
     local  downloads amartya16/Agastya-RAG-2B from Hugging Face on first use
            (~4.6GB); DECISION_MODEL_DIR (path) or DECISION_MODEL_ID (hub id)
-           override the source
+           override the source.
+           Runs from the pinned decision environment in
+           requirements-agastya-rag.txt: unsloth caps transformers at 5.17.0
+           while the retrieval stack needs >=5.19, so the two cannot share
+           one environment. Serve this file with --serve and set
+           DECISION_URL=http://127.0.0.1:8000 in the MCP server environment.
 """
 
 from __future__ import annotations
@@ -62,6 +67,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from typesafe_sdk import TypeSafeClient
+from device import pick_device
 
 BASE = Path(__file__).resolve().parent
 CLOUD_MODEL = "jev-latest"
@@ -246,12 +252,18 @@ def _load_local():
                 status_code=503,
                 detail=f"Local backend unavailable: checkpoint not found at {source}",
             )
+        import torch
+        four_bit = torch.cuda.is_available()
         try:
             from unsloth import FastDecisionModel
         except Exception as error:  # noqa: BLE001 - surfaced verbatim to the caller
             raise HTTPException(
                 status_code=503,
-                detail=f"Local backend unavailable: cannot import unsloth ({error})",
+                detail=f"Local backend unavailable: cannot import unsloth ({error})."
+                " The local stack caps transformers at 5.17.0 and cannot share an"
+                " environment with the embedder (transformers>=5.19); run this"
+                " service from requirements-agastya-rag.txt and point the MCP"
+                " server at it with DECISION_URL.",
             ) from error
 
         try:
@@ -262,13 +274,16 @@ def _load_local():
                 max_seq_length=2048,
                 # The checkpoint was trained 4-bit; fp32 is ~8.5 GB and will OOM
                 # on an 8 GB card before inference starts.
-                load_in_4bit=True,
+                load_in_4bit=four_bit,
             )
             FastDecisionModel.for_inference(model)
         except Exception as error:  # noqa: BLE001
             raise HTTPException(
                 status_code=503,
-                detail=f"Local backend unavailable: model load failed ({error})",
+                detail=f"Local backend unavailable: model load failed ({error})" + (
+                    " The local decision backend is verified on CUDA; on macOS or CPU-only machines use the cloud backend or a CUDA box."
+                    if not four_bit else ""
+                ),
             ) from error
 
         _local_model, _local_tokenizer = model, tokenizer
@@ -322,6 +337,7 @@ def health() -> dict[str, Any]:
                 "model": CLOUD_MODEL,
             },
             "local": {
+                "device": pick_device(),
                 "loaded": _local_model is not None,
                 "model": _local_model_name
                 or (LOCAL_MODEL_ID if is_hub else Path(source).name),

@@ -9,16 +9,23 @@ description = "PDF retrieval and typed decisions for MCP agents"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
+# EmbeddingGemma 2 needs transformers >= 5.19: the embeddinggemma-2
+# architecture is not in older releases and the model ships no custom code
+# fallback. The upper bound keeps the serving install off future majors.
+# The local decision model (unsloth) caps transformers at 5.17.0 and cannot
+# share this environment: run it from requirements-agastya-rag.txt and point
+# DECISION_URL at that service.
 dependencies = [
-  "mcp>=1.9", "numpy", "pymupdf", "torch", "sentence-transformers",
+  "mcp>=1.9", "numpy", "pymupdf", "torch>=2.1", "sentence-transformers>=6.2", "transformers>=5.19,<6",
 ]
 
 [project.optional-dependencies]
 parquet = ["pyarrow"]
 decision = ["fastapi", "uvicorn", "pydantic>=2", "python-dotenv", "typesafe-sdk"]
+bench = ["requests"]
 
 [project.scripts]
 agastya = "main:cli"
 
 [tool.setuptools]
-py-modules = ["main", "split_pdf", "gemma", "decision_model"]
+py-modules = ["main", "split_pdf", "gemma", "decision_model", "device"]

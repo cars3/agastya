@@ -37,7 +37,10 @@ from rank_bm25 import BM25Okapi
 from typesafe_sdk import Noul
 
 from gemma import embed_documents, embed_query, load_model, top_k
-from jev import ask
+try:
+    from jev import ask
+except ModuleNotFoundError:
+    raise SystemExit("this benchmark needs jev.py (the old cloud decision client), which is not part of this release; see benchmarks/README.md")
 
 DOMAINS = ["education", "finance", "law", "medicine", "natural_sciences", "social_sciences"]
 PUBLISHED = {"STAIR": 82.6, "DSI": 76.9, "DPR": 68.7, "BM25": 59.5, "Mistral": 13.8}

@@ -32,7 +32,10 @@ from datasets import load_dataset
 from typesafe_sdk import Noul
 
 from gemma import embed_documents, embed_query, load_model
-from jev import ask
+try:
+    from jev import ask
+except ModuleNotFoundError:
+    raise SystemExit("this benchmark needs jev.py (the old cloud decision client), which is not part of this release; see benchmarks/README.md")
 
 DOMAINS = ["education", "finance", "law", "medicine", "natural_sciences", "social_sciences"]
 CACHE_DIR = Path(__file__).resolve().parent / "data" / "searchtome"

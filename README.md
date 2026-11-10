@@ -134,64 +134,6 @@ share identical output shapes.
 `requirements-agastya-rag.txt` for the original machine-specific GPU
 environment.
 
-The older `core.py` HTTP service and benchmark scripts still import the removed
-`jev` module and are not currently supported by the MCP installation.
-
-## Performance at a Glance
-
-| Metric | Measured result |
-| --- | --- |
-| SearchTome benchmark | 6,005 queries across 6 domains |
-| Gold-section recall | 89.1% |
-| Average retrieval budget | 3.6 sections/query |
-| Deep textbook retrieval | 95% leaf hit rate |
-| NIST SP 800-53 retrieval | 93.3% leaf hit rate |
-| Median latency on deep textbook | 0.42 seconds |
-| Tested hardware | RTX 2060 SUPER, 8GB VRAM |
-| Model fine-tuning | None |
-| Empty retrieval results | Zero in evaluated runs |
-
-These measurements cover distinct evaluation settings. SearchTome provides an external benchmark, while the deep textbook and NIST evaluations test navigation over larger hierarchical documents.
-
-## Benchmarks
-
-### SearchTome: 6,005 Queries
-
-Evaluation on the complete public SearchTome release across six domains.
-
-| Retrieval system | Recall@1 | Recall@3 | Gold recall at retrieval budget |
-| --- | --- | --- | --- |
-| BM25 | 47.8% | 68.1% | - |
-| Jev-only ranking | 54.2% | 75.7% | - |
-| EmbeddingGemma 2 | 64.2% | 84.5% | 84.5% at 3 leaves |
-| Agastya RAG | 64.2% | 84.5% | 89.1% at 3.6 leaves |
-
-Agastya does not improve the top-one ranking over EmbeddingGemma in this evaluation. Its improvement comes from expanding the relevant candidate set while maintaining a small retrieval budget.
-
-### Deep Document Evaluation
-
-Tested on a 389-leaf textbook.
-
-| Configuration | Leaf hit rate | Leaves/query | Median latency |
-| --- | --- | --- | --- |
-| Strict Jev hierarchy walk | 45% | 1.5 | 0.54s |
-| Agastya combined pipeline | 95% | 4.2 | 0.42s |
-
-This demonstrates why combining semantic retrieval with hierarchical navigation matters: a structural walk alone can prune away the correct answer, while the embedding union can recover it.
-
-### Enterprise Compliance Evaluation
-
-Tested using NIST SP 800-53 Revision 5, organized into 331 control sections.
-
-| System | Result |
-| --- | --- |
-| Dense EmbeddingGemma | 81.7% Recall@1 |
-| Dense EmbeddingGemma | 93.3% Recall@3 |
-| Agastya RAG | 93.3% leaf hit at 5.5 leaves |
-| Agastya median latency | 0.40s |
-
-These results demonstrate practical retrieval on a structured regulatory corpus without domain-specific model fine-tuning.
-
 ## Agastya vs. IBM STAIR
 
 Both recognize that document hierarchies contain useful information that traditional flat retrieval systems often ignore.
